@@ -172,15 +172,32 @@ const StaffCard = () => {
           <Typography variant="h6">Загрузка данных...</Typography>
         )}
       </Box>
-      <section style={{ display: 'flex', border: '2px solid white', flexDirection: 'column', padding: '16px', margin: '10px 0' }}>
-        {person?.films?.length > 0 ? (
+      <section
+        style={{
+          display: 'flex',
+          border: '2px solid white',
+          flexDirection: 'column',
+          padding: '16px',
+          margin: '10px 0',
+        }}
+      >
+        {person?.films && person.films.length > 0 ? (
           <>
             <Typography variant="h5" gutterBottom>
               Фильмы в которых принимал участие:
             </Typography>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', padding: '8px 0' }}>
               {currentFilms.map((film, index) => (
-                <div key={index} style={{ minWidth: '200px', flexShrink: 0, padding: '8px', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '4px' }}>
+                <div
+                  key={index}
+                  style={{
+                    minWidth: '200px',
+                    flexShrink: 0,
+                    padding: '8px',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: '4px',
+                  }}
+                >
                   <a href={`/film/${film.filmId}`} style={{ textDecoration: 'none', color: 'white', display: 'block' }}>
                     <Typography variant="subtitle1">{film.nameRu || 'Название неизвестно'}</Typography>
                     <Typography variant="body2">Рейтинг: {film.rating || 'нет'}</Typography>

@@ -1,9 +1,24 @@
 import React, { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { Film } from '../pages/Home'; // Тип Film, который уже определен у тебя
+
+// Типы для данных, которые мы получаем от API
+interface ApiGenre {
+  genre: string;
+}
+
+interface ApiFilm {
+  filmId: number;
+  nameRu: string;
+  genres: ApiGenre[];
+  posterUrlPreview: string;
+  rating: number | null;
+  ratingImdb: number | null;
+}
 
 interface SearchProps {
-  onSearch: (films: string[]) => void;
+  onSearch: (films: Film[]) => void;
 }
 
 const Search: React.FC<SearchProps> = ({ onSearch }) => {
@@ -25,13 +40,14 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
       );
       const data = await response.json();
 
-      const formattedFilms = data.films.map((film: any) => ({
+      // Типизация ответа от API
+      const formattedFilms: Film[] = data.films.map((film: ApiFilm) => ({
         kinopoiskId: film.filmId,
         nameRu: film.nameRu,
-        genres: film.genres ? film.genres.map((genre: any) => ({ genre: genre.genre })) : [],
+        genres: film.genres ? film.genres.map((genre) => ({ genre: genre.genre })) : [],
         posterUrlPreview: film.posterUrlPreview,
-        ratingKinopoisk: film.rating && !isNaN(film.rating) ? parseFloat(film.rating) : undefined,
-        ratingImdb: film.ratingImdb && !isNaN(film.ratingImdb) ? parseFloat(film.ratingImdb) : undefined,
+        ratingKinopoisk: film.rating && !isNaN(film.rating) ? parseFloat(film.rating.toString()) : undefined,
+        ratingImdb: film.ratingImdb && !isNaN(film.ratingImdb) ? parseFloat(film.ratingImdb.toString()) : undefined,
       }));
 
       onSearch(formattedFilms);
