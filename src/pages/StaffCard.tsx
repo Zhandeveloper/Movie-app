@@ -1,6 +1,6 @@
 import { Box, Button, IconButton, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
@@ -198,10 +198,10 @@ const StaffCard = () => {
                     borderRadius: '4px',
                   }}
                 >
-                  <a href={`/film/${film.filmId}`} style={{ textDecoration: 'none', color: 'white', display: 'block' }}>
+                  <Link to={`/film/${film.filmId}`} style={{ textDecoration: 'none', color: 'white', display: 'block' }}>
                     <Typography variant="subtitle1">{film.nameRu || 'Название неизвестно'}</Typography>
                     <Typography variant="body2">Рейтинг: {film.rating || 'нет'}</Typography>
-                  </a>
+                  </Link>
                 </div>
               ))}
             </div>
