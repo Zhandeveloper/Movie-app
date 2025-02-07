@@ -1,0 +1,13 @@
+.App{
+    
+}
+
+
+.similarsMovieCard {
+  transition: all 0.7s ease;
+}
+.similarsMovieCard:hover {
+  filter: brightness(1.1);
+  transform: scale(1.05);
+  box-shadow: 0px 5px 10px rgba(56, 46, 46, 0.2);
+}
