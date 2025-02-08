@@ -28,9 +28,23 @@ const Navbar: React.FC<NavbarProps> = ({ onCategoryChange, onSearch }) => {
             <Button
               color="inherit"
               sx={{ fontSize: '21px', textTransform: 'capitalize' }}
-              onClick={() => onCategoryChange('TOP_POPULAR_MOVIES')}
+              onClick={() => onCategoryChange('TOP_POPULAR_ALL')}
             >
               Топ популярных
+            </Button>
+            <Button
+              color="inherit"
+              sx={{ fontSize: '21px', textTransform: 'capitalize' }}
+              onClick={() => onCategoryChange('VAMPIRE_THEME')}
+            >
+              про Вампиров
+            </Button>
+            <Button
+              color="inherit"
+              sx={{ fontSize: '21px', textTransform: 'capitalize' }}
+              onClick={() => onCategoryChange('COMICS_THEME')}
+            >
+              Фильмы по комиксам
             </Button>
             <Button
               color="inherit"

@@ -123,9 +123,9 @@ const StaffCard = () => {
           },
         }}
       >
-        <KeyboardBackspaceIcon sx={{ fontSize: '30px' }} />
+        <KeyboardBackspaceIcon sx={{ fontSize: '37px' }} />
       </IconButton>
-      <Box sx={{ p: 3, display: 'flex' }}>
+      <Box sx={{ marginLeft: '1%', display: 'flex' }}>
         {person ? (
           <>
             <div>
@@ -138,7 +138,7 @@ const StaffCard = () => {
                 sx={{
                   color: 'white',
                   height: 52,
-                  marginRight: 8,
+                  margin: '4px',
                   padding: '14px 28px',
                   fontSize: 16,
                   fontWeight: 600,
@@ -161,7 +161,16 @@ const StaffCard = () => {
                 <PersonIcon sx={{ marginRight: '4px' }} /> В Кинопоиске
               </Button>
             </div>
-            <Box sx={{ display: 'flex', flexDirection: 'column', fontSize: '30px', marginLeft: '8%' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                fontSize: '30px',
+                marginLeft: '8%',
+                justifyContent: 'center',
+                gap: '20px',
+              }}
+            >
               <p>Возраст: {person.age} лет</p>
               <p>Место рождения: {person.birthplace}</p>
               <p>Дата рождения: {person.birthday ? formatDate(person.birthday) : 'Неизвестно'}</p>
@@ -174,17 +183,19 @@ const StaffCard = () => {
       </Box>
       <section
         style={{
+          margin: '5px',
+          marginTop: '1.5%',
           display: 'flex',
           border: '2px solid white',
           flexDirection: 'column',
           padding: '16px',
-          margin: '10px 0',
+          borderRadius: '12px',
         }}
       >
         {person?.films && person.films.length > 0 ? (
           <>
             <Typography variant="h5" gutterBottom>
-              Фильмы в которых принимал участие:
+              Фильмы с участием:
             </Typography>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', padding: '8px 0' }}>
               {currentFilms.map((film, index) => (
@@ -198,7 +209,10 @@ const StaffCard = () => {
                     borderRadius: '4px',
                   }}
                 >
-                  <Link to={`/film/${film.filmId}`} style={{ textDecoration: 'none', color: 'white', display: 'block' }}>
+                  <Link
+                    to={`/film/${film.filmId}`}
+                    style={{ textDecoration: 'none', color: 'white', display: 'block' }}
+                  >
                     <Typography variant="subtitle1">{film.nameRu || 'Название неизвестно'}</Typography>
                     <Typography variant="body2">Рейтинг: {film.rating || 'нет'}</Typography>
                   </Link>
@@ -226,16 +240,16 @@ const StaffCard = () => {
         {person?.facts && person.facts.length > 0 && (
           <Box
             sx={{
-              border: '2px solid white',
+              marginTop: '2%',
               width: '100%',
-              fontSize: '23px',
+              fontSize: '26px',
               marginLeft: '0%',
             }}
           >
             <h3 style={{ margin: 5 }}>Интересные факты:</h3>
             <ul style={{ listStyleType: 'none' }}>
               {person.facts.map((fact, index) => (
-                <li key={index} style={{ marginTop: '10px' }}>
+                <li key={index} style={{ marginTop: '1.5%' }}>
                   {`${index + 1}) ${fact}`}
                 </li>
               ))}

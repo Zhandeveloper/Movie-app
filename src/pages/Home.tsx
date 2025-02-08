@@ -5,14 +5,16 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
+import WestIcon from '@mui/icons-material/West';
+import EastIcon from '@mui/icons-material/East';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-// Типы для данных фильма
+
 export interface Film {
   kinopoiskId: number;
   nameRu: string;
-  genres?: { genre: string }[]; // Массив объектов жанров
+  genres?: { genre: string }[];
   posterUrlPreview?: string;
   ratingKinopoisk?: number;
   ratingImdb?: number;
@@ -20,11 +22,28 @@ export interface Film {
 }
 
 const handleButtonClick = (filmId: number) => {
-  const filmUrl = `https://www.kinopoisk.ru/film/${filmId}/`; // Сформируйте URL фильма на сайте Кинопоиска
-  window.open(filmUrl, '_blank'); // Открываем ссылку в новой вкладке
+  const filmUrl = `https://www.kinopoisk.ru/film/${filmId}/`;
+  window.open(filmUrl, '_blank');
+};
+// Функия для скролла сайта
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth', // Плавная прокрутка
+  });
 };
 
-// Компонент MediaCard
+const NameConvertHanlder = (category?:string):string => {
+switch(category){
+  case 'TOP_250_TV_SHOWS':
+    return 'Топ лучших сериалов';
+    case 'TOP_250_MOVIES':
+    return 'Топ лучших фильмов'
+  default:
+    return 'Неизвестно'
+}
+}
+
 const MediaCard: React.FC<{
   title: string;
   image: string;
@@ -51,9 +70,7 @@ const MediaCard: React.FC<{
         },
       }}
     >
-      {/* Контейнер для изображения и рейтинга */}
       <Box sx={{ position: 'relative' }}>
-        {/* Рейтинг в левом верхнем углу */}
         <Box
           sx={{
             position: 'absolute',
@@ -83,11 +100,9 @@ const MediaCard: React.FC<{
         >
           {ratingKinopoisk && ratingKinopoisk > 0 ? ratingKinopoisk : ratingImdb && ratingImdb > 0 ? ratingImdb : 'u/k'}
         </Box>
-        {/* Изображение */}
         <CardMedia component="img" image={image} sx={{ objectFit: 'cover' }} />
       </Box>
 
-      {/* Контент карточки */}
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
           {title}
@@ -97,7 +112,7 @@ const MediaCard: React.FC<{
             genres.map((genreObj, index) => (
               <span key={index} className="genre" style={{ color: 'orange', fontSize: '25px' }}>
                 {genreObj.genre}
-                {index < genres.length - 1 && ', '} {/* Разделитель запятой */}
+                {index < genres.length - 1 && ', '}
               </span>
             ))}
         </Typography>
@@ -108,30 +123,36 @@ const MediaCard: React.FC<{
           sx={{ textTransform: 'capitalize', fontSize: '24px' }}
           onClick={() => handleButtonClick(kinopoiskId)}
         >
-          Смотреть в кинопосике
+          Смотреть в кинопоиске
         </Button>
       </CardActions>
     </Card>
   );
 };
+
 const Home: React.FC = () => {
   const [films, setFilms] = useState<Film[]>([]);
   const [category, setCategory] = useState<string>('TOP_POPULAR_MOVIES');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
-  // Восстанавливаем состояние из localStorage
   useEffect(() => {
     const savedFilms = localStorage.getItem('searchedFilms');
     if (savedFilms) {
       setFilms(JSON.parse(savedFilms));
     } else {
-      fetchFilms(category);
+      fetchFilms(category, currentPage);
     }
-  }, [category]); // Добавил зависимость от category
+  }, [category, currentPage]);
 
-  const fetchFilms = async (category: string) => {
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [category]);
+
+  const fetchFilms = async (category: string, page: number) => {
     try {
       const response = await fetch(
-        `https://kinopoiskapiunofficial.tech/api/v2.2/films/collections?type=${category}&page=1`,
+        `https://kinopoiskapiunofficial.tech/api/v2.2/films/collections?type=${category}&page=${page}`,
         {
           method: 'GET',
           headers: {
@@ -142,13 +163,13 @@ const Home: React.FC = () => {
       );
       const data = await response.json();
       setFilms(data.items || []);
-      localStorage.removeItem('searchedFilms'); // Очищаем сохранённый поиск при смене категории
+      setTotalPages(data.totalPages || 1);
+      localStorage.removeItem('searchedFilms');
     } catch (error) {
       console.error('Ошибка при загрузке данных:', error);
     }
   };
 
-  // Функция обработки поиска
   const handleSearch = (searchResults: Film[]) => {
     setFilms(searchResults);
     localStorage.setItem('searchedFilms', JSON.stringify(searchResults));
@@ -156,17 +177,24 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <Navbar onCategoryChange={(newCategory) => {
-        setCategory(newCategory);
-        localStorage.removeItem('searchedFilms'); // Очищаем поиск при выборе жанра
-      }} onSearch={handleSearch} />
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '20px', flexWrap: 'wrap' }}>
+      <Navbar
+        onCategoryChange={(newCategory) => {
+          setCategory(newCategory);
+          localStorage.removeItem('searchedFilms');
+        }}
+        onSearch={handleSearch}
+      />
+      <div
+        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '10px', flexWrap: 'wrap' }}
+      >
         {films.map((film) => (
           <Link key={film.kinopoiskId} to={`/film/${film.kinopoiskId}`} style={{ textDecoration: 'none' }}>
             <MediaCard
               key={film.kinopoiskId}
               title={film.nameRu}
-              ratingKinopoisk={film.ratingKinopoisk && film.ratingKinopoisk > 0 ? film.ratingKinopoisk : film.ratingImdb ?? undefined}
+              ratingKinopoisk={
+                film.ratingKinopoisk && film.ratingKinopoisk > 0 ? film.ratingKinopoisk : film.ratingImdb ?? undefined
+              }
               kinopoiskId={film.kinopoiskId}
               image={film.posterUrlPreview || '/placeholder.jpg'}
               genres={film.genres || []}
@@ -174,9 +202,34 @@ const Home: React.FC = () => {
           </Link>
         ))}
       </div>
+
+      {films.length > 0 && !localStorage.getItem('searchedFilms') && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', gap:'100px', marginTop:'40px' }}>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setCurrentPage((prev) => Math.max(prev - 1, 1));
+              scrollToTop(); // Прокрутка вверх
+            }}
+            disabled={currentPage === 1}
+          >
+            {currentPage > 1 && <WestIcon sx={{ fontSize: '35px', padding:'10%' }} />}
+          </Button>
+           <Typography variant='h5'>{NameConvertHanlder(category)}</Typography>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setCurrentPage((prev) => prev + 1);
+              scrollToTop(); // Прокрутка вверх
+            }}
+            disabled={currentPage >= totalPages}
+          >
+            <EastIcon sx={{ fontSize: '35px', padding:'10%' }} />
+          </Button>
+        </Box>
+      )}
     </>
   );
 };
-
 
 export default Home;
