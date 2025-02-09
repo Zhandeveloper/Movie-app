@@ -174,7 +174,7 @@ const StaffCard = () => {
               <p>Возраст: {person.age} лет</p>
               <p>Место рождения: {person.birthplace}</p>
               <p>Дата рождения: {person.birthday ? formatDate(person.birthday) : 'Неизвестно'}</p>
-              <p>Рост: {person.growth} см</p>
+              <p>Рост: {person.growth === 0 ? 'неизвестно' : `${person.growth} см`}</p>
             </Box>
           </>
         ) : (
@@ -199,14 +199,21 @@ const StaffCard = () => {
             </Typography>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', padding: '8px 0' }}>
               {currentFilms.map((film, index) => (
-                <div
+                <Box
                   key={index}
-                  style={{
+                  sx={{
                     minWidth: '200px',
                     flexShrink: 0,
                     padding: '8px',
                     border: '1px solid rgba(255,255,255,0.2)',
                     borderRadius: '4px',
+                    cursor: 'pointer',
+                    transition: 'background .2s ease, transform .2s ease',
+                    '&:hover': {
+                      transform: 'scale(1.05)',
+                      filter: 'brightness(1.1)',
+                      boxShadow: '0px 5px 10px rgba(56, 46, 46, 0.2)',
+                    },
                   }}
                 >
                   <Link
@@ -216,7 +223,7 @@ const StaffCard = () => {
                     <Typography variant="subtitle1">{film.nameRu || 'Название неизвестно'}</Typography>
                     <Typography variant="body2">Рейтинг: {film.rating || 'нет'}</Typography>
                   </Link>
-                </div>
+                </Box>
               ))}
             </div>
 

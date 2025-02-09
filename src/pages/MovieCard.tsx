@@ -31,6 +31,12 @@ interface SimilarMovie {
   relationType: string;
 }
 
+interface Video {
+  url: string;
+  name: string;
+  site: string;
+}
+
 export interface Staff {
   staffId: number;
   nameRu: string;
@@ -87,6 +93,7 @@ const MovieCard: React.FC = () => {
   const [loadingSimilar, setLoadingSimilar] = useState(false);
   const [errorSimilar, setErrorSimilar] = useState('');
   const [staff, setStaff] = useState<Staff[]>([]);
+  const [youtubeTrailers, setYoutubeTrailers] = useState<Video[]>([]);
 
   // Загрузка данных о фильме
   const fetchMovieCard = async (id: string) => {
@@ -151,10 +158,36 @@ const MovieCard: React.FC = () => {
     }
   };
 
+  const fetchVideos = async (id: string) => {
+    try {
+      const response = await fetch(`https://kinopoiskapiunofficial.tech/api/v2.2/films/${id}/videos`, {
+        headers: {
+          'X-API-KEY': '8c8e1a50-6322-4135-8875-5d40a5420d86',
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+
+      // Фильтруем видео
+      const trailers = data.items.filter((video: Video) => {
+        const isYoutube = video.site === 'YOUTUBE';
+        const isTrailer = video.name.toLowerCase().includes('трейлер');
+        return isYoutube && isTrailer;
+      });
+
+      setYoutubeTrailers(trailers.slice(0, 1));
+    } catch (error) {
+      console.error('Ошибка при загрузке видео:', error);
+    }
+  };
+
   useEffect(() => {
     if (id) {
       fetchMovieCard(id);
       fetchStaff(id);
+      fetchVideos(id);
+      setShowSimilarMovies(false);
+      window.scrollTo(0, 0);
     }
   }, [id]);
 
@@ -289,7 +322,6 @@ const MovieCard: React.FC = () => {
           {loadingSimilar ? 'Загрузка...' : showSimilarMovies ? 'Скрыть' : 'Похожие фильмы'}
         </Button>
       </section>
-
       {showSimilarMovies && (
         <section style={{ marginTop: '40px' }}>
           <h2 style={{ marginBottom: '20px' }}>Похожие фильмы:</h2>
@@ -348,7 +380,74 @@ const MovieCard: React.FC = () => {
         </section>
       )}
       {errorSimilar && <div style={{ color: 'red', marginTop: '20px' }}>Ошибка: {errorSimilar}</div>}
+      {youtubeTrailers.length > 0 && (
+        <section
+          style={{
+            marginTop: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+          }}
+        >
+          <>
+            {youtubeTrailers.map((video) => {
+              const embedUrl = video.url
+                .replace('/v/', '/embed/')
+                .replace('www.youtube.com/v/', 'www.youtube.com/embed/');
 
+              return (
+                <>
+                  <Button
+                    sx={{
+                      color: 'white',
+                      height: 52,
+                      padding: '14px 28px',
+                      fontSize: 16,
+                      fontWeight: 600,
+                      lineHeight: 20,
+                      borderRadius: '1000px',
+                      background: 'linear-gradient(135deg,rgb(133, 45, 241) 69.93%,rgb(10, 32, 173))',
+                      transition: 'background .2s ease, transform .2s ease',
+                      marginBottom: '9px',
+                      '&:hover': {
+                        transform: 'scale(1.05)',
+                        filter: 'brightness(1.1)',
+                        boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
+                      },
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.open(video.url);
+                    }}
+                  >
+                    {video.name}
+                  </Button>
+                  <div
+                    style={{
+                      width: '75%',
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      borderRadius: '8px',
+                      padding: '15px',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <iframe
+                      width="100%"
+                      src={embedUrl}
+                      title={video.name}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      style={{ borderRadius: '4px', height: '750px' }}
+                    />
+                  </div>
+                </>
+              );
+            })}
+          </>
+        </section>
+      )}
       <h1>Киногруппа:</h1>
       {staff && staff.length > 0 ? (
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
@@ -364,8 +463,8 @@ const MovieCard: React.FC = () => {
               }}
             >
               <Link
-              key={item.staffId}
-              to={`/staff/${item.staffId}`}
+                key={item.staffId}
+                to={`/staff/${item.staffId}`}
                 style={{
                   textDecoration: 'none',
                   color: 'inherit',

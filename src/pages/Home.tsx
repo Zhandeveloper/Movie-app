@@ -33,16 +33,22 @@ const scrollToTop = () => {
   });
 };
 
-const NameConvertHanlder = (category?:string):string => {
-switch(category){
-  case 'TOP_250_TV_SHOWS':
-    return 'Топ лучших сериалов';
+const NameConvertHanlder = (category?: string): string => {
+  switch (category) {
+    case 'TOP_250_TV_SHOWS':
+      return 'Топ лучших сериалов';
     case 'TOP_250_MOVIES':
-    return 'Топ лучших фильмов'
-  default:
-    return 'Неизвестно'
-}
-}
+      return 'Топ лучших фильмов';
+    case 'TOP_POPULAR_ALL':
+      return 'Топ поплярных фильмов';
+    case 'COMICS_THEME':
+      return 'Фильмы по комиксам';
+    case 'VAMPIRE_THEME':
+      return 'Фильмы про вамиров';
+    default:
+      return 'Неизвестно';
+  }
+};
 
 const MediaCard: React.FC<{
   title: string;
@@ -204,7 +210,16 @@ const Home: React.FC = () => {
       </div>
 
       {films.length > 0 && !localStorage.getItem('searchedFilms') && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white', gap:'100px', marginTop:'40px' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            color: 'white',
+            gap: '100px',
+            marginTop: '40px',
+          }}
+        >
           <Button
             variant="contained"
             onClick={() => {
@@ -213,9 +228,17 @@ const Home: React.FC = () => {
             }}
             disabled={currentPage === 1}
           >
-            {currentPage > 1 && <WestIcon sx={{ fontSize: '35px', padding:'10%' }} />}
+            {currentPage > 1 && <WestIcon sx={{ fontSize: '35px', padding: '10%' }} />}
           </Button>
-           <Typography variant='h5'>{NameConvertHanlder(category)}</Typography>
+
+          {/* Сюда добавим текст с текущей страницей */}
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="h5">{NameConvertHanlder(category)}</Typography>
+            <Typography variant="subtitle1" sx={{ marginTop: '5px', fontSize: '18px' }}>
+              Страница {currentPage} из {totalPages}
+            </Typography>
+          </Box>
+
           <Button
             variant="contained"
             onClick={() => {
@@ -224,7 +247,7 @@ const Home: React.FC = () => {
             }}
             disabled={currentPage >= totalPages}
           >
-            <EastIcon sx={{ fontSize: '35px', padding:'10%' }} />
+            <EastIcon sx={{ fontSize: '35px', padding: '10%' }} />
           </Button>
         </Box>
       )}

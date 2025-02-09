@@ -37,14 +37,14 @@ const Navbar: React.FC<NavbarProps> = ({ onCategoryChange, onSearch }) => {
               sx={{ fontSize: '21px', textTransform: 'capitalize' }}
               onClick={() => onCategoryChange('VAMPIRE_THEME')}
             >
-              про Вампиров
+              Про Вампиров
             </Button>
             <Button
               color="inherit"
               sx={{ fontSize: '21px', textTransform: 'capitalize' }}
               onClick={() => onCategoryChange('COMICS_THEME')}
             >
-              Фильмы по комиксам
+              По комиксам
             </Button>
             <Button
               color="inherit"
