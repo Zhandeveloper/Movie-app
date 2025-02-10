@@ -31,7 +31,7 @@ interface SimilarMovie {
   relationType: string;
 }
 
-interface Video {
+export interface Video {
   url: string;
   name: string;
   site: string;
@@ -298,7 +298,28 @@ const MovieCard: React.FC = () => {
           <PlayArrowIcon />
           Imdb
         </Button>
-
+        <Button
+          sx={{
+            color: 'white',
+            height: 52,
+            padding: '14px 28px',
+            fontSize: 16,
+            fontWeight: 600,
+            lineHeight: 20,
+            borderRadius: '1000px',
+            background: 'linear-gradient(135deg,rgb(213, 34, 233) 1.93%,rgb(235, 197, 27))',
+            transition: 'background .2s ease, transform .2s ease',
+            '&:hover': {
+              transform: 'scale(1.05)',
+              filter: 'brightness(1.1)',
+              boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
+            },
+          }}
+        >
+          <Link key={film.kinopoiskId} to={`/videos/${film.kinopoiskId}`} style={{ textDecoration: 'none', color:'white' } }>
+            Видео
+          </Link>
+        </Button>
         <Button
           sx={{
             color: 'white',
