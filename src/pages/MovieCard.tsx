@@ -1,4 +1,5 @@
 import { Box, Button, IconButton } from '@mui/material';
+import MovieIcon from '@mui/icons-material/Movie';
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -213,17 +214,22 @@ const MovieCard: React.FC = () => {
       >
         <KeyboardBackspaceIcon sx={{ fontSize: '30px' }} />
       </IconButton>
-      <header style={{ display: 'flex' }}>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'column', md: 'row', lg: 'row', xl: 'row' } }}>
         <div style={{ marginLeft: '2%' }}>
           <h1>{film.nameRu}</h1>
-          <img src={film.posterUrl} alt={film.nameRu} style={{ width: '450px' }} />
+          <Box
+            component="img"
+            src={film.posterUrl}
+            alt={film.nameRu}
+            sx={{ width: { xs: '325px', sm: '450px', md: '450px', lg: '450px', xl: '500px' } }}
+          />
         </div>
-        <div
-          style={{
+        <Box
+          sx={{
             display: 'flex',
             flexDirection: 'column',
             fontSize: '30px',
-            marginLeft: '12%',
+            marginLeft: { xs: '0%', sm: '0%', md: '12%', lg: '12%', xl: '12%' },
           }}
         >
           <p>Оригинальное название: {film.nameOriginal || 'Неизвестно'}</p>
@@ -235,8 +241,8 @@ const MovieCard: React.FC = () => {
           <p>Возрастное ограничение: {AgeHandler(film.ratingAgeLimits)}</p>
           <p>Страны произовдства: {film.countries?.map((country) => country.country).join(', ') || 'Неизвестно'}</p>
           <p>Тип: {typeContentHandler(film.type)}</p>
-        </div>
-      </header>
+        </Box>
+      </Box>
       <section style={{ fontSize: '32px' }}>
         <p>{film.description || 'Описание отсутствует.'}</p>
       </section>
@@ -298,54 +304,44 @@ const MovieCard: React.FC = () => {
           <PlayArrowIcon />
           Imdb
         </Button>
+
         <Button
-          sx={{
-            color: 'white',
-            height: 52,
-            padding: '14px 28px',
-            fontSize: 16,
-            fontWeight: 600,
-            lineHeight: 20,
-            borderRadius: '1000px',
-            background: 'linear-gradient(135deg,rgb(213, 34, 233) 1.93%,rgb(235, 197, 27))',
-            transition: 'background .2s ease, transform .2s ease',
-            '&:hover': {
-              transform: 'scale(1.05)',
-              filter: 'brightness(1.1)',
-              boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
-            },
-          }}
-        >
-          <Link key={film.kinopoiskId} to={`/videos/${film.kinopoiskId}`} style={{ textDecoration: 'none', color:'white' } }>
-            Видео
-          </Link>
-        </Button>
-        <Button
-          sx={{
-            color: 'white',
-            height: 52,
-            padding: '14px 28px',
-            fontSize: 16,
-            fontWeight: 600,
-            lineHeight: 20,
-            borderRadius: '1000px',
-            background: 'linear-gradient(135deg, #0066ff 69.93%, #00c2ff)',
-            transition: 'background .2s ease, transform .2s ease',
-            '&:hover': {
-              transform: 'scale(1.05)',
-              filter: 'brightness(1.1)',
-              boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
-            },
-          }}
-          onClick={fetchSimilarMovies}
-          disabled={loadingSimilar}
-        >
-          {loadingSimilar ? 'Загрузка...' : showSimilarMovies ? 'Скрыть' : 'Похожие фильмы'}
-        </Button>
+  sx={{
+    color: 'white',
+    height: 52,
+    padding: '14px 28px',
+    fontSize: 16,
+    fontWeight: 600,
+    lineHeight: 20,
+    borderRadius: '1000px',
+    background: 'linear-gradient(135deg, #0066ff 69.93%, #00c2ff)',
+    transition: 'background .2s ease, transform .2s ease',
+    display: 'flex', // Добавляем для корректного расположения текста и иконки
+    alignItems: 'center',
+    gap: '10px', // Отступ между иконкой и текстом
+    '&:hover': {
+      transform: 'scale(1.05)',
+      filter: 'brightness(1.1)',
+      boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
+    },
+  }}
+  onClick={fetchSimilarMovies}
+  disabled={loadingSimilar}
+>
+  {/* Иконка будет отображаться только если не идёт загрузка и не выбрана опция "Скрыть" */}
+  {(!loadingSimilar && !showSimilarMovies) && (
+    <MovieIcon sx={{ fontSize: '30px' }} />
+  )}
+
+  {/* Текст кнопки */}
+  {loadingSimilar ? 'Загрузка...' : showSimilarMovies ? 'Скрыть' : 'Похожие фильмы'}
+</Button>
+
       </section>
       {showSimilarMovies && (
         <section style={{ marginTop: '40px' }}>
-          <h2 style={{ marginBottom: '20px' }}>Похожие фильмы:</h2>
+          <h2 style={{ marginBottom: '20px' }}> 
+            Похожие фильмы:</h2>
           {similarMovies.length > 0 ? (
             <div
               style={{
@@ -463,6 +459,33 @@ const MovieCard: React.FC = () => {
                       style={{ borderRadius: '4px', height: '750px' }}
                     />
                   </div>
+                  <Button
+                    sx={{
+                      color: 'white',
+                      height: 52,
+                      marginTop: '15px',
+                      padding: '14px 28px',
+                      fontSize: 16,
+                      fontWeight: 600,
+                      lineHeight: 20,
+                      borderRadius: '1000px',
+                      background: 'linear-gradient(135deg,rgb(213, 34, 233) 1.93%,rgb(235, 197, 27))',
+                      transition: 'background .2s ease, transform .2s ease',
+                      '&:hover': {
+                        transform: 'scale(1.05)',
+                        filter: 'brightness(1.1)',
+                        boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
+                      },
+                    }}
+                  >
+                    <Link
+                      key={film.kinopoiskId}
+                      to={`/videos/${film.kinopoiskId}`}
+                      style={{ textDecoration: 'none', color: 'white' }}
+                    >
+                      Все Видео
+                    </Link>
+                  </Button>
                 </>
               );
             })}

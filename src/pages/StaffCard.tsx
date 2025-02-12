@@ -125,14 +125,14 @@ const StaffCard = () => {
       >
         <KeyboardBackspaceIcon sx={{ fontSize: '37px' }} />
       </IconButton>
-      <Box sx={{ marginLeft: '1%', display: 'flex' }}>
+      <Box sx={{ marginLeft: '1%', display: 'flex', flexDirection: { xs: 'column', sm: 'column', md: 'row', lg: 'row', xl: 'row' } }}>
         {person ? (
           <>
             <div>
               <Typography variant="h2" gutterBottom>
                 {person.nameRu || person.nameEn}
               </Typography>
-              <img src={person.posterUrl} alt={person.nameRu} />
+              <img src={person.posterUrl} alt={person.nameRu} style={{maxWidth:'90%'}} />
               <Typography variant="h5">Профессия: {person.profession}</Typography>
               <Button
                 sx={{
@@ -168,7 +168,7 @@ const StaffCard = () => {
                 fontSize: '30px',
                 marginLeft: '8%',
                 justifyContent: 'center',
-                gap: '20px',
+                gap: '5%',
               }}
             >
               <p>Возраст: {person.age} лет</p>
