@@ -11,6 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
+
 export interface Film {
   kinopoiskId: number;
   nameRu: string;
@@ -40,11 +41,13 @@ const NameConvertHanlder = (category?: string): string => {
     case 'TOP_250_MOVIES':
       return 'Топ лучших фильмов';
     case 'TOP_POPULAR_ALL':
-      return 'Топ поплярных фильмов';
+      return 'Топ популярных фильмов и сериалов';
     case 'COMICS_THEME':
       return 'Фильмы по комиксам';
     case 'VAMPIRE_THEME':
       return 'Фильмы про вамиров';
+    case 'TOP_POPULAR_MOVIES':
+      return 'Топ популярных фильмов';
     default:
       return 'Неизвестно';
   }
@@ -61,8 +64,8 @@ const MediaCard: React.FC<{
   return (
     <Card
       sx={{
-        margin: '10px',
-        width: 400,
+        margin: { xs: '9px', sm: '9px', md: '9px', lg: '9px', xl: '10px' },
+        width: {xs: '270px', sm: '300px', md: '350px', lg: '370px', xl: '400px' },
         backgroundColor: 'rgb(28, 28, 53)',
         color: 'white',
         borderRadius: '10px',
@@ -129,7 +132,7 @@ const MediaCard: React.FC<{
           sx={{ textTransform: 'capitalize', fontSize: '24px' }}
           onClick={() => handleButtonClick(kinopoiskId)}
         >
-          Смотреть в кинопоиске
+          в кинопоиске
         </Button>
       </CardActions>
     </Card>
@@ -216,7 +219,7 @@ const Home: React.FC = () => {
             justifyContent: 'center',
             alignItems: 'center',
             color: 'white',
-            gap: '100px',
+            gap: {xs: '50px', sm: '70px', md: '80px', lg: '100px', xl: '100px'} ,
             marginTop: '40px',
           }}
         >
@@ -228,7 +231,7 @@ const Home: React.FC = () => {
             }}
             disabled={currentPage === 1}
           >
-            {currentPage > 1 && <WestIcon sx={{ fontSize: '35px', padding: '10%' }} />}
+            {currentPage > 1 && <WestIcon sx={{padding:'10px', fontSize:{xs:'25px', xl:'35px'} }} />}
           </Button>
 
           {/* Сюда добавим текст с текущей страницей */}
@@ -247,7 +250,7 @@ const Home: React.FC = () => {
             }}
             disabled={currentPage >= totalPages}
           >
-            <EastIcon sx={{ fontSize: '35px', padding: '10%' }} />
+            <EastIcon sx={{padding:'10px', fontSize:{xs:'25px', xl:'35px'} }} />
           </Button>
         </Box>
       )}

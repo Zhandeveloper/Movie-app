@@ -13,15 +13,15 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ onCategoryChange, onSearch }) => {
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ flexGrow: 1, margin:0, padding:0 }}>
       <AppBar position="static" sx={{ display: 'flex', justifyContent: 'center' }}>
-        <Toolbar sx={{ flexDirection: 'column', alignItems: 'center', width: '98%' }}>
+        <Toolbar sx={{ flexDirection: 'column', alignItems: 'center', width: '90%' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
             <IconButton edge="start" color="inherit" aria-label="menu">
               <MenuIcon />
             </IconButton>
           </Box>
-          <Box sx={{ width: '70%' }}>
+          <Box sx={{ width:{ xs: '90%', xl: '70%' } }}>
             <Search onSearch={onSearch} /> {/* Передаём в `Search` */}
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: '25px', flexWrap: 'wrap' }}>
