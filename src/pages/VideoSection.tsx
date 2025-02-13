@@ -94,10 +94,10 @@ const VideosSection: React.FC = () => {
                   >
                     {video.name} - YT
                   </Button>
-                  <div
-                    style={{
-                      width: '75%',
-                      height: '700px',
+                  <Box
+                    sx={{
+                      width:{xl:'75%', lg:'95%', md:'95%', sm:'95%', xs:'95%'},
+                      height:{xl:'750px', lg:'750px', md:'650px', sm:'500px', xs:'450px'},
                       marginBottom: '3%',
                       textAlign: 'center',
                       border: '2px solid white',
@@ -105,7 +105,8 @@ const VideosSection: React.FC = () => {
                       padding: '2px',
                     }}
                   >
-                    <iframe
+                    <Box
+                    component='iframe'
                       width="100%"
                       height="100%"
                       src={`https://www.youtube.com/embed/${video.url.split('v=')[1]}`}
@@ -113,37 +114,52 @@ const VideosSection: React.FC = () => {
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
-                    ></iframe>
-                  </div>
+                    ></Box>
+                  </Box>
+                  <hr  style={{width:'100%',   border:'2px solid #EF5257', marginTop:'20px'}}/>
                 </>
               ) : (
+                <>
                 <div style={{ marginTop: '25px' }}>
-                  <Button
-                    sx={{
-                      color: 'white',
-                      height: 45,
-                      padding: '14px 28px',
-                      fontSize: 16,
-                      fontWeight: 550,
-                      lineHeight: 12,
-                      borderRadius: '1000px',
-                      background: 'linear-gradient(135deg,rgb(213, 34, 233) 1.93%,rgb(235, 197, 27))',
-                      transition: 'background .2s ease, transform .2s ease',
-                      marginBottom: '15px',
-                      '&:hover': {
-                        transform: 'scale(1.05)',
-                        filter: 'brightness(1.1)',
-                        boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
-                      },
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      window.open(video.url);
-                    }}
-                  >
-                    {video.name} - KinopoiskWidget
-                  </Button>
+                <Button
+  sx={{
+    color: 'white',
+    height: 45,
+    padding: '10px 20px',
+    fontSize: 14,
+    fontWeight: 550,
+    lineHeight: 1, // Уменьшаем высоту строки для лучшего вмещения текста
+    borderRadius: '1000px',
+    background: 'linear-gradient(135deg,rgb(213, 34, 233) 1.93%,rgb(235, 197, 27))',
+    transition: 'background .2s ease, transform .2s ease',
+    marginBottom: '15px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    minWidth: '120px', // Минимальная ширина кнопки
+    maxWidth: '90vw', // Ограничиваем ширину кнопки на мобильных
+    whiteSpace: 'normal', // Позволяет переносить текст
+    wordBreak: 'break-word', // Разрывает длинные слова, если не помещаются
+    overflow: 'hidden', // Если что-то выходит за пределы — скрываем
+    textOverflow: 'ellipsis', // Добавляет "..." при переполнении
+    '&:hover': {
+      transform: 'scale(1.05)',
+      filter: 'brightness(1.1)',
+      boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
+    },
+  }}
+  onClick={(e) => {
+    e.preventDefault();
+    window.open(video.url);
+  }}
+>
+  {video.name} - KinopoiskWidget
+</Button>
+
                 </div>
+                 <hr  style={{width:'100%',   border:'2px solid purple', marginTop:'20px'}}/>
+                </>
               )}
             </React.Fragment>
           ))
