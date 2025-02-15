@@ -76,7 +76,7 @@ const VideosSection: React.FC = () => {
                       padding: '14px 28px',
                       fontSize: 16,
                       fontWeight: 550,
-                      lineHeight: 20,
+                      
                       borderRadius: '1000px',
                       background: 'linear-gradient(135deg,rgb(241, 19, 56) 65.93%,rgb(234, 223, 237))',
                       transition: 'background .2s ease, transform .2s ease',
