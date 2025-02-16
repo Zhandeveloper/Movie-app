@@ -6,6 +6,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import '../index.scss';
 import MovieReviews from '../components/MovieReviews';
+import MovieStaff from '../components/MovieStaff';
 
 interface MovieCardData {
   kinopoiskId: number;
@@ -39,14 +40,7 @@ export interface Video {
   site: string;
 }
 
-export interface Staff {
-  staffId: number;
-  nameRu: string;
-  nameEn: string;
-  description?: string;
-  posterUrl?: string;
-  professionText?: string;
-}
+
 
 // Вспомогательные функции
 const formatDuration = (minutes?: number): string => {
@@ -94,7 +88,7 @@ const MovieCard: React.FC = () => {
   const [showSimilarMovies, setShowSimilarMovies] = useState(false);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
   const [errorSimilar, setErrorSimilar] = useState('');
-  const [staff, setStaff] = useState<Staff[]>([]);
+  
   const [youtubeTrailers, setYoutubeTrailers] = useState<Video[]>([]);
 
   // Загрузка данных о фильме
@@ -114,22 +108,7 @@ const MovieCard: React.FC = () => {
     }
   };
 
-  //Запрос для получение актерского состава фильма
-  const fetchStaff = async (id: string) => {
-    try {
-      const response = await fetch(`https://kinopoiskapiunofficial.tech/api/v1/staff?filmId=${id}`, {
-        method: 'GET',
-        headers: {
-          'X-API-KEY': '8c8e1a50-6322-4135-8875-5d40a5420d86',
-          'Content-Type': 'application/json',
-        },
-      });
-      const data = await response.json();
-      setStaff(data.slice(0, 20));
-    } catch (error) {
-      console.error('Ошибка при загрузке данных актерского состава:', error);
-    }
-  };
+  
 
   // Загрузка похожих фильмов
   const fetchSimilarMovies = async () => {
@@ -186,7 +165,6 @@ const MovieCard: React.FC = () => {
   useEffect(() => {
     if (id) {
       fetchMovieCard(id);
-      fetchStaff(id);
       fetchVideos(id);
       setShowSimilarMovies(false);
       window.scrollTo(0, 0);
@@ -474,7 +452,7 @@ const MovieCard: React.FC = () => {
                 <Box
                   key={video.url}
                   sx={{
-                    width: { xl: '75%', lg: '95%', md: '95%', sm: '95%', xs: '95%' },
+                    width: { xl: '75%', lg: '95%', md: '95%', sm: '100%', xs: '100%' },
                     textAlign: 'center',
                   }}
                 >
@@ -523,14 +501,14 @@ const MovieCard: React.FC = () => {
                     </Button>
                   </Box>
 
-                  <div
-                    style={{
+                  <Box
+                    sx={{
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
                       backgroundColor: 'rgba(255,255,255,0.1)',
                       borderRadius: '8px',
-                      padding: '15px',
+                      padding:{ xl: '14px', lg: '12px', md: '12px', sm: '10px', xs: '3px'},
                     }}
                   >
                     <Box
@@ -543,10 +521,10 @@ const MovieCard: React.FC = () => {
                       width="100%"
                       sx={{
                         borderRadius: '4px',
-                        height: { xl: '750px', lg: '750px', md: '650px', sm: '500px', xs: '450px' },
+                        height: { xl: '750px', lg: '750px', md: '650px', sm: '450px', xs: '400px' },
                       }}
                     />
-                  </div>
+                  </Box>
                 </Box>
               );
             })}
@@ -609,54 +587,7 @@ const MovieCard: React.FC = () => {
           </Button>
         )}
       </section>
-
-      <h1>Киногруппа:</h1>
-      {staff && staff.length > 0 ? (
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
-          {staff.map((item) => (
-            <div
-              className="similarsMovieCard"
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                borderRadius: '8px',
-                padding: '10px',
-                height: '100%',
-                width: '150px',
-              }}
-            >
-              <Link
-                key={item.staffId}
-                to={`/staff/${item.staffId}`}
-                style={{
-                  textDecoration: 'none',
-                  color: 'inherit',
-                  marginTop: '10px',
-                  fontSize: '20px',
-                  transition: 'transform 0.2s',
-                }}
-              >
-                <img
-                  src={item.posterUrl}
-                  alt={item.nameRu}
-                  style={{
-                    width: '100%',
-                    height: '250px',
-                    objectFit: 'cover',
-                    borderRadius: '4px',
-                  }}
-                />
-                <h4 style={{ margin: '0 0 8px' }}>{item.nameRu || item.nameEn}</h4>
-                <p style={{ color: '#2862DE', fontSize: '17px', margin: '0', fontWeight: 'bold' }}>
-                  {item.description}
-                </p>
-                <p style={{ color: 'gray', fontSize: '17px', margin: '0' }}>{item.professionText}</p>
-              </Link>
-            </div>
-          ))}
-        </Box>
-      ) : (
-        <h2>Нету данных</h2>
-      )}
+      <MovieStaff movieId={id}/>
       <section>
       <MovieReviews movieId={id}/>
       </section>
