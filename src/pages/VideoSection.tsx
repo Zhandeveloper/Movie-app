@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Video } from './MovieCard';
 import { Box, Button, IconButton } from '@mui/material';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-
+import YouTubeIcon from '@mui/icons-material/YouTube';
 const VideosSection: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [videos, setVideos] = useState<Video[]>([]);
@@ -92,6 +92,7 @@ const VideosSection: React.FC = () => {
                       window.open(video.url);
                     }}
                   >
+                    <YouTubeIcon/>
                     {video.name} - YT
                   </Button>
                   <Box

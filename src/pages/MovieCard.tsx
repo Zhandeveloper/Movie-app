@@ -7,6 +7,10 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import '../index.scss';
 import MovieReviews from '../components/MovieReviews';
 import MovieStaff from '../components/MovieStaff';
+import YouTubeIcon from '@mui/icons-material/YouTube';
+import LocalMoviesIcon from '@mui/icons-material/LocalMovies';
+import LiveTvIcon from '@mui/icons-material/LiveTv';
+import SlideshowIcon from '@mui/icons-material/Slideshow';
 
 interface MovieCardData {
   kinopoiskId: number;
@@ -275,7 +279,7 @@ const MovieCard: React.FC = () => {
             }
           }}
         >
-          <PlayArrowIcon />
+          <LocalMoviesIcon/>
           Imdb
         </Button>
         <p>{film.description || 'Описание отсутствует.'}</p>
@@ -312,7 +316,7 @@ const MovieCard: React.FC = () => {
             window.open(url, '_blank');
           }}
         >
-          <PlayArrowIcon />
+          <SlideshowIcon sx={{marginRight:'2px'}}/>
           Смотреть в VK
         </Button>
 
@@ -339,7 +343,7 @@ const MovieCard: React.FC = () => {
             window.open(`https://www.youtube.com/results?search_query=${film.nameRu}`);
           }}
         >
-          <PlayArrowIcon />
+          <YouTubeIcon/>
           YouTube
         </Button>
 
@@ -497,7 +501,9 @@ const MovieCard: React.FC = () => {
                         window.open(video.url);
                       }}
                     >
+                      <LiveTvIcon sx={{marginRight:'4px'}}/>
                       {video.name}
+                      
                     </Button>
                   </Box>
 
