@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import SearchIcon from '@mui/icons-material/Search';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { Film } from '../pages/Home'; // Тип Film, который уже определен у тебя
+
 
 // Типы для данных, которые мы получаем от API
 interface ApiGenre {
@@ -88,6 +90,7 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
         }}
       />
       <Button variant="contained" onClick={fetchFilms} sx={{ fontSize: '18px', textTransform: 'none' }}>
+      <SearchIcon/>
         Искать
       </Button>
     </div>

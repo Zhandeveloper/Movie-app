@@ -1,4 +1,4 @@
-import { Box, Button, IconButton } from '@mui/material';
+import { Box, Button, IconButton, Typography } from '@mui/material';
 import MovieIcon from '@mui/icons-material/Movie';
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -11,6 +11,7 @@ import YouTubeIcon from '@mui/icons-material/YouTube';
 import LocalMoviesIcon from '@mui/icons-material/LocalMovies';
 import LiveTvIcon from '@mui/icons-material/LiveTv';
 import SlideshowIcon from '@mui/icons-material/Slideshow';
+import MovieFacts from '../components/MovieFacts';
 
 interface MovieCardData {
   kinopoiskId: number;
@@ -61,12 +62,23 @@ const formatDuration = (minutes?: number): string => {
 
 const typeContentHandler = (content?: string): string => {
   if (content === 'FILM') {
-    return 'Фильм';
+    return 'Фильмы';
   }
   if (content === 'TV_SERIES') {
-    return 'Сериал';
+    return 'Сериалы';
   } else {
     return 'Неизвестно';
+  }
+};
+
+const typeSingleContentHandler = (content?: string): string => {
+  if (content === 'FILM') {
+    return 'фильме';
+  }
+  if (content === 'TV_SERIES') {
+    return 'сериале';
+  } else {
+    return 'неизвестно';
   }
 };
 
@@ -374,7 +386,7 @@ const MovieCard: React.FC = () => {
           {!loadingSimilar && !showSimilarMovies && <MovieIcon sx={{ fontSize: '30px' }} />}
 
           {/* Текст кнопки */}
-          {loadingSimilar ? 'Загрузка...' : showSimilarMovies ? 'Скрыть' : 'Похожие фильмы'}
+          {loadingSimilar ? 'Загрузка...' : showSimilarMovies ? 'Скрыть' : `Похожие ${typeContentHandler(film.type)}`}
         </Button>
       </section>
       {showSimilarMovies && (
@@ -595,6 +607,13 @@ const MovieCard: React.FC = () => {
       </section>
       <MovieStaff movieId={id}/>
       <section>
+      <Typography variant="h5" gutterBottom>
+        {`Факты о ${typeSingleContentHandler(film.type)}:`}
+      </Typography>
+        <MovieFacts movieId={id}/>
+      </section>
+      <section>
+      
       <MovieReviews movieId={id}/>
       </section>
     </div>

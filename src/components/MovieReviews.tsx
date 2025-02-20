@@ -31,6 +31,7 @@ interface MovieReviewsProps {
 }
 
 const removeHtmlTags = (text: string) => text.replace(/<\/?[^>]+(>|$)/g, '');
+
 const MovieReviews: React.FC<MovieReviewsProps> = ({ movieId }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [amountReviews, setAmountReviews] = useState<AmountReviews | null>(null);
@@ -78,6 +79,15 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({ movieId }) => {
     fetchReviews();
   }, [movieId, sortOrder]);
 
+
+  const totalReviews =
+  (amountReviews?.totalPositiveReviews ?? 0) +
+  (amountReviews?.totalNegativeReviews ?? 0) +
+  (amountReviews?.totalNeutralReviews ?? 0);
+
+  const calculatePercentage = (count: number) =>
+    totalReviews > 0 ? ((count / totalReviews) * 100).toFixed(2) : '0';
+
   const toggleExpand = (index: number) => {
     setExpandedReviews((prev) => ({
       ...prev,
@@ -98,15 +108,21 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({ movieId }) => {
         <Box sx={{ mb: 2, color: 'white' }}>
           <Typography variant="h6">
             Всего позитивных отзывов:{' '}
-            <span style={{ color: 'lime' }}>{amountReviews?.totalPositiveReviews ?? 'Неизвестно'}</span>
+            <span style={{ color: 'lime' }}>
+              {amountReviews?.totalPositiveReviews ?? 'Неизвестно'} ({calculatePercentage(amountReviews?.totalPositiveReviews ?? 0)}%)
+            </span>
           </Typography>
           <Typography variant="h6">
             Всего негативных отзывов:{' '}
-            <span style={{ color: 'red' }}>{amountReviews?.totalNegativeReviews ?? 'Неизвестно'}</span>
+            <span style={{ color: 'red' }}>
+              {amountReviews?.totalNegativeReviews ?? 'Неизвестно'} ({calculatePercentage(amountReviews?.totalNegativeReviews ?? 0)}%)
+            </span>
           </Typography>
           <Typography variant="h6">
             Всего нейтральных отзывов:{' '}
-            <span style={{ color: '#0BB7DB' }}>{amountReviews?.totalNeutralReviews ?? 'Неизвестно'}</span>
+            <span style={{ color: '#0BB7DB' }}>
+              {amountReviews?.totalNeutralReviews ?? 'Неизвестно'} ({calculatePercentage(amountReviews?.totalNeutralReviews ?? 0)}%)
+            </span>
           </Typography>
         </Box>
       )}
