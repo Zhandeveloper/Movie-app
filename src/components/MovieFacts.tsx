@@ -76,7 +76,9 @@ const MovieFacts: React.FC<MoviesFactsProps> = ({ movieId }) => {
                 : text.slice(0, 10) + '...'
               : isExpanded 
                 ? text 
-                : text.slice(0, maxLength);
+                : text.length > maxLength
+                  ? text.slice(0, maxLength) + '...'
+                  : text;
             const shouldShowButton = text.length > maxLength && !fact.spoiler;
 
             return (
