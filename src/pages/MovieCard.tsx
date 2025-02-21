@@ -45,8 +45,6 @@ export interface Video {
   site: string;
 }
 
-
-
 // Вспомогательные функции
 const formatDuration = (minutes?: number): string => {
   if (!minutes) return 'Нет данных';
@@ -104,7 +102,7 @@ const MovieCard: React.FC = () => {
   const [showSimilarMovies, setShowSimilarMovies] = useState(false);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
   const [errorSimilar, setErrorSimilar] = useState('');
-  
+
   const [youtubeTrailers, setYoutubeTrailers] = useState<Video[]>([]);
 
   // Загрузка данных о фильме
@@ -123,8 +121,6 @@ const MovieCard: React.FC = () => {
       console.error('Ошибка при загрузке данных:', error);
     }
   };
-
-  
 
   // Загрузка похожих фильмов
   const fetchSimilarMovies = async () => {
@@ -223,8 +219,11 @@ const MovieCard: React.FC = () => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            fontSize: '30px',
+            fontSize: { xs: '22px', sm: '27px', md: '28px', lg: '30px', xl: '30px' },
             marginLeft: { xs: '0%', sm: '0%', md: '12%', lg: '12%', xl: '12%' },
+            '& p': {
+              '@media (max-width:600px)': { marginTop:'10px'}, // Только на телефонах
+            },
           }}
         >
           <p>Оригинальное название: {film.nameOriginal || 'Неизвестно'}</p>
@@ -291,10 +290,10 @@ const MovieCard: React.FC = () => {
             }
           }}
         >
-          <LocalMoviesIcon/>
+          <LocalMoviesIcon />
           Imdb
         </Button>
-        <p>{film.description || 'Описание отсутствует.'}</p>
+        <Typography sx={{ fontSize: { xs: '24px', sm: '27px', md: '28px', lg: '30px', xl: '30px' },}}>{film.description || 'Описание отсутствует.'}</Typography>
       </section>
       <section style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
         <Button
@@ -328,7 +327,7 @@ const MovieCard: React.FC = () => {
             window.open(url, '_blank');
           }}
         >
-          <SlideshowIcon sx={{marginRight:'2px'}}/>
+          <SlideshowIcon sx={{ marginRight: '2px' }} />
           Смотреть в VK
         </Button>
 
@@ -355,7 +354,7 @@ const MovieCard: React.FC = () => {
             window.open(`https://www.youtube.com/results?search_query=${film.nameRu}`);
           }}
         >
-          <YouTubeIcon/>
+          <YouTubeIcon />
           YouTube
         </Button>
 
@@ -513,9 +512,8 @@ const MovieCard: React.FC = () => {
                         window.open(video.url);
                       }}
                     >
-                      <LiveTvIcon sx={{marginRight:'4px'}}/>
+                      <LiveTvIcon sx={{ marginRight: '4px' }} />
                       {video.name}
-                      
                     </Button>
                   </Box>
 
@@ -526,7 +524,7 @@ const MovieCard: React.FC = () => {
                       alignItems: 'center',
                       backgroundColor: 'rgba(255,255,255,0.1)',
                       borderRadius: '8px',
-                      padding:{ xl: '14px', lg: '12px', md: '12px', sm: '10px', xs: '3px'},
+                      padding: { xl: '14px', lg: '12px', md: '12px', sm: '10px', xs: '3px' },
                     }}
                   >
                     <Box
@@ -605,16 +603,15 @@ const MovieCard: React.FC = () => {
           </Button>
         )}
       </section>
-      <MovieStaff movieId={id}/>
+      <MovieStaff movieId={id} />
       <section>
-      <Typography variant="h5" gutterBottom>
-        {`Факты о ${typeSingleContentHandler(film.type)}:`}
-      </Typography>
-        <MovieFacts movieId={id}/>
+        <Typography variant="h5" gutterBottom>
+          {`Факты о ${typeSingleContentHandler(film.type)}:`}
+        </Typography>
+        <MovieFacts movieId={id} />
       </section>
       <section>
-      
-      <MovieReviews movieId={id}/>
+        <MovieReviews movieId={id} />
       </section>
     </div>
   );

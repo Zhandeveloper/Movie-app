@@ -68,7 +68,7 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({ movieId }) => {
           totalNeutralReviews: data.totalNeutralReviews,
         });
         setReviews(data.items);
-        setVisibleCount(10);
+        setVisibleCount(5);
       } catch (error) {
         console.error('Ошибка при загрузке данных:', error);
       } finally {

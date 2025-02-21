@@ -37,7 +37,7 @@ const MovieStaff: React.FC<MovieStaffProps> = ({ movieId }) => {
         }
         const data = await response.json();
         setStaff(data);
-        setVisibleCount(window.innerWidth < 1000 ? 6 : 20);
+        setVisibleCount(window.innerWidth < 1000 ? 4 : 20);
       } catch (err) {
         setError('Ошибка при загрузке данных актерского состава');
         console.error(err);

@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Typography } from '@mui/material';
+import { Box, Button, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
@@ -46,6 +46,15 @@ interface Person {
 }
 
 const StaffCard = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const truncateText = (text: string | undefined, maxLength: number) => {
+    if (!text) return 'Название неизвестно';
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + '...';
+  };
+
   function formatDate(birthday: string): string {
     const date = new Date(birthday);
     if (isNaN(date.getTime())) {
@@ -62,7 +71,7 @@ const StaffCard = () => {
   const { id } = useParams();
   const [person, setPerson] = useState<Person | undefined>(undefined);
   const [currentPage, setCurrentPage] = useState(0);
-  const filmsPerPage = 10;
+  const filmsPerPage = 7;
 
   const sortFilmsByRating = (films: Film[]) => {
     return films.sort((a, b) => {
@@ -125,14 +134,25 @@ const StaffCard = () => {
       >
         <KeyboardBackspaceIcon sx={{ fontSize: '37px' }} />
       </IconButton>
-      <Box sx={{ marginLeft: '1%', display: 'flex', flexDirection: { xs: 'column', sm: 'column', md: 'row', lg: 'row', xl: 'row' } }}>
+      <Box
+        sx={{
+          marginLeft: '1%',
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'column', md: 'row', lg: 'row', xl: 'row' },
+        }}
+      >
         {person ? (
           <>
             <div>
-              <Typography variant="h2" gutterBottom>
+              <Typography variant="h3" gutterBottom>
                 {person.nameRu || person.nameEn}
               </Typography>
-              <img src={person.posterUrl} alt={person.nameRu} style={{maxWidth:'90%'}} />
+              <Box
+                component="img"
+                src={person.posterUrl}
+                alt={person.nameRu}
+                sx={{ maxWidth: { xs: '300px', sm: '500px', md: '600px', lg: '900px', xl: '950px' } }}
+              />
               <Typography variant="h5">Профессия: {person.profession}</Typography>
               <Button
                 sx={{
@@ -165,10 +185,11 @@ const StaffCard = () => {
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
-                fontSize: '30px',
-                marginLeft: '8%',
+                margin: '0px',
+                marginLeft: { xs: '0%', sm: '0%', md: '8%', lg: '8%', xl: '8%' },
                 justifyContent: 'center',
                 gap: '5%',
+                fontSize: { xs: '22px', sm: '27px', md: '28px', lg: '30px', xl: '30px' },
               }}
             >
               <p>Возраст: {person.age} лет</p>
@@ -222,7 +243,7 @@ const StaffCard = () => {
                       to={`/film/${film.filmId}`}
                       style={{ textDecoration: 'none', color: 'white', display: 'block' }}
                     >
-                      <Typography variant="subtitle1">{film.nameRu || 'Название неизвестно'}</Typography>
+                      <Typography variant="subtitle1">{truncateText(film.nameRu, isMobile ? 30 : Infinity)}</Typography>
                       <Typography variant="body2">Рейтинг: {film.rating || 'нет'}</Typography>
                     </Link>
                   </Box>

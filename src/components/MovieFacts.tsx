@@ -18,7 +18,7 @@ const removeHtmlTags = (text: string) => {
 
 const MovieFacts: React.FC<MoviesFactsProps> = ({ movieId }) => {
   const [facts, setFacts] = useState<Fact[]>([]);
-  const [visibleCount, setVisibleCount] = useState<number>(5);
+  const [visibleCount, setVisibleCount] = useState<number>(3);
   const [expandedFacts, setExpandedFacts] = useState<{ [key: number]: boolean }>({});
   const [maxLength, setMaxLength] = useState(700);
 
