@@ -219,7 +219,7 @@ const MovieCard: React.FC = () => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            fontSize: { xs: '22px', sm: '27px', md: '28px', lg: '30px', xl: '30px' },
+            fontSize: { xs: '25px', sm: '27px', md: '28px', lg: '30px', xl: '30px' },
             marginLeft: { xs: '0%', sm: '0%', md: '12%', lg: '12%', xl: '12%' },
             '& p': {
               '@media (max-width:600px)': { marginTop:'10px'}, // Только на телефонах
