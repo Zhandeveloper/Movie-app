@@ -21,7 +21,7 @@ const Navbar: React.FC<NavbarProps> = ({ onCategoryChange, onSearch }) => {
               <MenuIcon />
             </IconButton>
           </Box>
-          <Box sx={{ width:{ xs: '90%', xl: '70%' } }}>
+          <Box sx={{ width:{ xs: '95%', xl: '70%' } }}>
             <Search onSearch={onSearch} /> {/* Передаём в `Search` */}
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: '25px', flexWrap: 'wrap' }}>

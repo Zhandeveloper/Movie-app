@@ -12,6 +12,7 @@ import LocalMoviesIcon from '@mui/icons-material/LocalMovies';
 import LiveTvIcon from '@mui/icons-material/LiveTv';
 import SlideshowIcon from '@mui/icons-material/Slideshow';
 import MovieFacts from '../components/MovieFacts';
+import RelatedMovies from '../components/RelatedMovies';
 
 interface MovieCardData {
   kinopoiskId: number;
@@ -238,6 +239,7 @@ const MovieCard: React.FC = () => {
         </Box>
       </Box>
       <section style={{ fontSize: '27px' }}>
+        <RelatedMovies movieId={id}/>
         <Button
           sx={{
             color: 'white',

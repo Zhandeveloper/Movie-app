@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, MenuItem, SelectChangeEvent, Select } from '@mui/material';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -10,7 +10,6 @@ import EastIcon from '@mui/icons-material/East';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-
 
 export interface Film {
   kinopoiskId: number;
@@ -26,11 +25,11 @@ const handleButtonClick = (filmId: number) => {
   const filmUrl = `https://www.kinopoisk.ru/film/${filmId}/`;
   window.open(filmUrl, '_blank');
 };
-// Функия для скролла сайта
+
 const scrollToTop = () => {
   window.scrollTo({
     top: 0,
-    behavior: 'smooth', // Плавная прокрутка
+    behavior: 'smooth',
   });
 };
 
@@ -65,7 +64,7 @@ const MediaCard: React.FC<{
     <Card
       sx={{
         margin: { xs: '9px', sm: '9px', md: '9px', lg: '9px', xl: '10px' },
-        width: {xs: '270px', sm: '300px', md: '350px', lg: '370px', xl: '400px' },
+        width: { xs: '270px', sm: '300px', md: '350px', lg: '370px', xl: '400px' },
         backgroundColor: 'rgb(28, 28, 53)',
         color: 'white',
         borderRadius: '10px',
@@ -145,6 +144,9 @@ const Home: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
 
+
+
+
   useEffect(() => {
     const savedFilms = localStorage.getItem('searchedFilms');
     if (savedFilms) {
@@ -152,6 +154,7 @@ const Home: React.FC = () => {
     } else {
       fetchFilms(category, currentPage);
     }
+    scrollToTop();
   }, [category, currentPage]);
 
   useEffect(() => {
@@ -182,6 +185,11 @@ const Home: React.FC = () => {
   const handleSearch = (searchResults: Film[]) => {
     setFilms(searchResults);
     localStorage.setItem('searchedFilms', JSON.stringify(searchResults));
+  };
+
+  const handlePageChange = (event: SelectChangeEvent<number>) => {
+    const page = Number(event.target.value);
+    setCurrentPage(page);
   };
 
   return (
@@ -219,38 +227,60 @@ const Home: React.FC = () => {
             justifyContent: 'center',
             alignItems: 'center',
             color: 'white',
-            gap: {xs: '50px', sm: '70px', md: '80px', lg: '100px', xl: '100px'} ,
+            gap: { xs: '50px', sm: '70px', md: '80px', lg: '100px', xl: '100px' },
             marginTop: '40px',
           }}
         >
           <Button
             variant="contained"
-            onClick={() => {
-              setCurrentPage((prev) => Math.max(prev - 1, 1));
-              scrollToTop(); // Прокрутка вверх
-            }}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
           >
-            {currentPage > 1 && <WestIcon sx={{padding:'10px', fontSize:{xs:'25px', xl:'35px'} }} />}
+            {currentPage > 1 && <WestIcon sx={{ padding: '10px', fontSize: { xs: '25px', xl: '35px' } }} />}
           </Button>
 
-          {/* Сюда добавим текст с текущей страницей */}
           <Box sx={{ textAlign: 'center' }}>
             <Typography variant="h5">{NameConvertHanlder(category)}</Typography>
-            <Typography variant="subtitle1" sx={{ marginTop: '5px', fontSize: '18px' }}>
-              Страница {currentPage} из {totalPages}
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', mt: 1 }}>
+              <Typography variant="subtitle1">Страница</Typography>
+              <Select
+                value={currentPage}
+                onChange={handlePageChange}
+                sx={{
+                  color: 'orange',
+                  border: '1px solid orange',
+                  borderRadius: '4px',
+                  '& .MuiSelect-icon': { color: 'orange' },
+                  '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      bgcolor: 'rgb(28, 28, 53)',
+                      '& .MuiMenuItem-root': {
+                        color: 'white',
+                        '&:hover': { bgcolor: 'rgba(255, 165, 0, 0.2)' },
+                      },
+                    },
+                  },
+                }}
+              >
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <MenuItem key={page} value={page}>
+                    {page}
+                  </MenuItem>
+                ))}
+              </Select>
+              <Typography variant="subtitle1">из {totalPages}</Typography>
+            </Box>
           </Box>
 
           <Button
             variant="contained"
-            onClick={() => {
-              setCurrentPage((prev) => prev + 1);
-              scrollToTop(); // Прокрутка вверх
-            }}
+            onClick={() => setCurrentPage((prev) => prev + 1)}
             disabled={currentPage >= totalPages}
           >
-            <EastIcon sx={{padding:'10px', fontSize:{xs:'25px', xl:'35px'} }} />
+            <EastIcon sx={{ padding: '10px', fontSize: { xs: '25px', xl: '35px' } }} />
           </Button>
         </Box>
       )}
