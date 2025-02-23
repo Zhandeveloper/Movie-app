@@ -67,12 +67,36 @@ const RelatedMovies: React.FC<RelatedMoviesProps> = ({ movieId }) => {
 
   return (
     <Box>
-      <Button variant="contained" onClick={() => setShowRelated(!showRelated)} disabled={isLoading} sx={{margin:'15px 0px', fontSize:'16px'}}>
+      <Button
+        variant="contained"
+        onClick={() => setShowRelated(!showRelated)}
+        disabled={isLoading}
+        sx={{
+          margin: '15px 10px',
+          fontSize: '15px',
+          color: 'white',
+          height: 52,
+          marginRight: 8,
+          padding: '14px 28px',
+          fontWeight: 500,
+          borderRadius: '12px',
+          background: 'linear-gradient(135deg,rgb(10, 113, 216) 9.93%,rgb(129, 15, 216))',
+          transition: 'background .2s ease, transform .2s ease',
+          '&:hover': {
+            transform: 'scale(1.05)',
+            filter: 'brightness(1.1)',
+            boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
+          },
+        }}
+      >
         {showRelated ? 'Скрыть' : 'Показать сиквелы и приквелы'}
       </Button>
 
       {showRelated && (
-        <Box mt={2} sx={{ display:'flex', flexDirection:{ xs: 'column', sm: 'column', md: 'column', lg: 'row', xl: 'row' },}}>
+        <Box
+          mt={2}
+          sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'column', md: 'column', lg: 'row', xl: 'row' } }}
+        >
           {relatedMovies.length === 0 ? (
             <Typography variant="h6">Нет сиквелов и приквелов</Typography>
           ) : (
@@ -82,8 +106,8 @@ const RelatedMovies: React.FC<RelatedMoviesProps> = ({ movieId }) => {
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  
-                  margin:{ xs: '5px', sm: '5px', md: '5px', lg: '10px', xl: '10px' },
+
+                  margin: { xs: '5px', sm: '5px', md: '5px', lg: '10px', xl: '10px' },
                   mb: 2,
                   maxWidth: '500px',
                   color: 'white',
@@ -98,7 +122,7 @@ const RelatedMovies: React.FC<RelatedMoviesProps> = ({ movieId }) => {
                 <CardMedia component="img" sx={{ width: 100 }} image={movie.posterUrlPreview} alt={movie.nameRu} />
                 <CardContent>
                   <Typography variant="h6">{movie.nameRu || movie.nameEn || movie.nameOriginal}</Typography>
-                  <Typography variant="subtitle1" sx={{ color: '#2862DE', fontWeight:'525' }}>
+                  <Typography variant="subtitle1" sx={{ color: '#2862DE', fontWeight: '525' }}>
                     {TypeHandler(movie.relationType)}
                   </Typography>
                 </CardContent>

@@ -1,7 +1,8 @@
 import { Box, Button, IconButton, Typography } from '@mui/material';
 import MovieIcon from '@mui/icons-material/Movie';
+import HomeIcon from '@mui/icons-material/Home';
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import '../index.scss';
@@ -106,6 +107,7 @@ const MovieCard: React.FC = () => {
 
   const [youtubeTrailers, setYoutubeTrailers] = useState<Video[]>([]);
 
+  const navigate = useNavigate(); // Используем хук для навигации
   // Загрузка данных о фильме
   const fetchMovieCard = async (id: string) => {
     try {
@@ -206,6 +208,26 @@ const MovieCard: React.FC = () => {
       >
         <KeyboardBackspaceIcon sx={{ fontSize: '30px' }} />
       </IconButton>
+
+      <IconButton
+        sx={{ marginLeft: { xs: '30%', sm: '25%', md: '45%', lg: '45%', xl: '45%' } }}
+        onClick={() => navigate('/')} // Перенаправляет без перезагрузки
+      >
+        <HomeIcon
+          sx={{
+            fontSize: '30px',
+            padding: '8px',
+            borderRadius: '12px',
+            color: 'white',
+            background: 'linear-gradient(135deg, #f50 69.93%, #d6bb00)',
+            '&:hover': {
+              transform: 'scale(1.05)',
+              filter: 'brightness(1.1)',
+              boxShadow: '0px 5px 10px rgba(56, 46, 46, 0.2)',
+            },
+          }}
+        />
+      </IconButton>
       <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'column', md: 'row', lg: 'row', xl: 'row' } }}>
         <div style={{ marginLeft: '2%' }}>
           <h1>{film.nameRu}</h1>
@@ -223,7 +245,7 @@ const MovieCard: React.FC = () => {
             fontSize: { xs: '25px', sm: '27px', md: '28px', lg: '30px', xl: '30px' },
             marginLeft: { xs: '0%', sm: '0%', md: '12%', lg: '12%', xl: '12%' },
             '& p': {
-              '@media (max-width:600px)': { marginTop:'10px'}, // Только на телефонах
+              '@media (max-width:600px)': { marginTop: '10px' }, // Только на телефонах
             },
           }}
         >
@@ -239,7 +261,7 @@ const MovieCard: React.FC = () => {
         </Box>
       </Box>
       <section style={{ fontSize: '27px' }}>
-        <RelatedMovies movieId={id}/>
+        <RelatedMovies movieId={id} />
         <Button
           sx={{
             color: 'white',
@@ -295,7 +317,9 @@ const MovieCard: React.FC = () => {
           <LocalMoviesIcon />
           Imdb
         </Button>
-        <Typography sx={{ fontSize: { xs: '24px', sm: '27px', md: '28px', lg: '30px', xl: '30px' },}}>{film.description || 'Описание отсутствует.'}</Typography>
+        <Typography sx={{ fontSize: { xs: '24px', sm: '27px', md: '28px', lg: '30px', xl: '30px' } }}>
+          {film.description || 'Описание отсутствует.'}
+        </Typography>
       </section>
       <section style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
         <Button

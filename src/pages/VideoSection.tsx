@@ -4,6 +4,7 @@ import { Video } from './MovieCard';
 import { Box, Button, IconButton } from '@mui/material';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import YouTubeIcon from '@mui/icons-material/YouTube';
+import Footer from '../components/Footer';
 const VideosSection: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [videos, setVideos] = useState<Video[]>([]);
@@ -33,6 +34,7 @@ const VideosSection: React.FC = () => {
   }, [id]);
 
   return (
+    <>
     <div style={{backgroundColor: 'rgb(28, 28, 53)',}}>
       <IconButton
         onClick={() => {
@@ -169,6 +171,8 @@ const VideosSection: React.FC = () => {
         )}
       </Box>
     </div>
+    <Footer/>
+    </>
   );
 };
 

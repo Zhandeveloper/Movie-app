@@ -10,6 +10,7 @@ import EastIcon from '@mui/icons-material/East';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 export interface Film {
   kinopoiskId: number;
@@ -284,6 +285,7 @@ const Home: React.FC = () => {
           </Button>
         </Box>
       )}
+      <Footer/>
     </>
   );
 };

@@ -5,6 +5,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import Footer from '../components/Footer';
 
 interface Film {
   filmId: number;
@@ -119,6 +120,7 @@ const StaffCard = () => {
   };
 
   return (
+    <>
     <Box sx={{ fontFamily: 'roboto', color: 'white', backgroundColor: 'rgb(28, 28, 53)' }}>
       <IconButton
         onClick={() => window.history.back()}
@@ -289,6 +291,8 @@ const StaffCard = () => {
         )}
       </section>
     </Box>
+    <Footer/>
+    </>
   );
 };
 
