@@ -14,6 +14,7 @@ import LiveTvIcon from '@mui/icons-material/LiveTv';
 import SlideshowIcon from '@mui/icons-material/Slideshow';
 import MovieFacts from '../components/MovieFacts';
 import RelatedMovies from '../components/RelatedMovies';
+import BudgetMovie from '../components/BudgetMovie';
 
 interface MovieCardData {
   kinopoiskId: number;
@@ -261,6 +262,7 @@ const MovieCard: React.FC = () => {
         </Box>
       </Box>
       <section style={{ fontSize: '27px' }}>
+        <BudgetMovie movieId={id}/>
         <RelatedMovies movieId={id} />
         <Button
           sx={{
@@ -322,40 +324,50 @@ const MovieCard: React.FC = () => {
         </Typography>
       </section>
       <section style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
-        <Button
-          sx={{
-            color: 'white',
-            height: 52,
-            marginRight: 8,
-            padding: '14px 28px',
-            fontSize: 16,
-            fontWeight: 600,
-            borderRadius: '100px',
-            background: 'linear-gradient(135deg, #0066ff 69.93%, #00c2ff)',
-            transition: 'background .2s ease, transform .2s ease',
-            '&:hover': {
-              transform: 'scale(1.05)',
-              filter: 'brightness(1.1)',
-              boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
-            },
-          }}
-          onClick={(e) => {
-            e.preventDefault();
+      <Button
+  sx={{
+    color: 'white',
+    height: 52,
+    marginRight: 8,
+    padding: '14px 28px',
+    fontSize: 16,
+    fontWeight: 600,
+    borderRadius: '100px',
+    background: 'linear-gradient(135deg, #0066ff 69.93%, #00c2ff)',
+    transition: 'background .2s ease, transform .2s ease',
+    '&:hover': {
+      transform: 'scale(1.05)',
+      filter: 'brightness(1.1)',
+      boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
+    },
+  }}
+  onClick={(e) => {
+    e.preventDefault();
 
-            // Проверяем, является ли устройство мобильным
-            const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const query = encodeURIComponent(film.nameRu);
 
-            // Определяем нужную ссылку
-            const baseUrl = isMobile ? 'https://m.vkvideo.ru' : 'https://vkvideo.ru';
-            const url = `${baseUrl}/?q=${encodeURIComponent(film.nameRu)}&action=search`;
+    // Глубокая ссылка для открытия в приложении VK
+    const deepLink = `vk://vk.com/video?q=${query}`;
+    // Обычная ссылка, если deep link не сработает
+    const fallbackUrl = `https://vk.com/video?q=${query}`;
 
-            // Открываем ссылку в новой вкладке
-            window.open(url, '_blank');
-          }}
-        >
-          <SlideshowIcon sx={{ marginRight: '2px' }} />
-          Смотреть в VK
-        </Button>
+    if (isMobile) {
+      window.location.href = deepLink;
+      
+      // Таймер для fallback (если приложение не открылось)
+      setTimeout(() => {
+        window.location.href = fallbackUrl;
+      }, 1500);
+    } else {
+      window.open(fallbackUrl, '_blank');
+    }
+  }}
+>
+  <SlideshowIcon sx={{ marginRight: '2px' }} />
+  Смотреть в VK
+</Button>
+
 
         <Button
           sx={{
@@ -416,7 +428,7 @@ const MovieCard: React.FC = () => {
       </section>
       {showSimilarMovies && (
         <section style={{ marginTop: '40px' }}>
-          <h2 style={{ marginBottom: '20px' }}>Похожие фильмы:</h2>
+          <h2 style={{ marginBottom: '20px' }}>Похожие {typeContentHandler(film.type)}:</h2>
           {similarMovies.length > 0 ? (
             <div
               style={{

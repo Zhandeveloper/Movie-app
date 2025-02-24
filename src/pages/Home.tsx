@@ -248,8 +248,9 @@ const Home: React.FC = () => {
                 value={currentPage}
                 onChange={handlePageChange}
                 sx={{
-                  color: 'orange',
+                  color: 'white',
                   border: '1px solid orange',
+                  width:'75px',
                   borderRadius: '4px',
                   '& .MuiSelect-icon': { color: 'orange' },
                   '& .MuiOutlinedInput-notchedOutline': { border: 'none' },

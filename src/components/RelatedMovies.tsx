@@ -48,7 +48,9 @@ const RelatedMovies: React.FC<RelatedMoviesProps> = ({ movieId }) => {
           },
         });
         const data = await response.json();
-        setRelatedMovies(data || []);
+        if (data.length > 0) {
+          setRelatedMovies(data);
+        }
       } catch (error) {
         console.error('Ошибка при загрузке данных:', error);
       } finally {
@@ -60,10 +62,12 @@ const RelatedMovies: React.FC<RelatedMoviesProps> = ({ movieId }) => {
   }, [movieId]);
 
   const handleMovieClick = (filmId: number) => {
-    setIsLoading(true); // Отключаем кнопку при переходе
-    setShowRelated(false); // Закрываем список при переходе
+    setIsLoading(true);
+    setShowRelated(false);
     navigate(`/film/${filmId}`);
   };
+
+  if (relatedMovies.length === 0) return null;
 
   return (
     <Box>
@@ -95,40 +99,35 @@ const RelatedMovies: React.FC<RelatedMoviesProps> = ({ movieId }) => {
       {showRelated && (
         <Box
           mt={2}
-          sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'column', md: 'column', lg: 'row', xl: 'row' } }}
+          sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' } }}
         >
-          {relatedMovies.length === 0 ? (
-            <Typography variant="h6">Нет сиквелов и приквелов</Typography>
-          ) : (
-            relatedMovies.map((movie) => (
-              <Card
-                key={movie.filmId}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-
-                  margin: { xs: '5px', sm: '5px', md: '5px', lg: '10px', xl: '10px' },
-                  mb: 2,
-                  maxWidth: '500px',
-                  color: 'white',
-                  backgroundColor: 'rgba(255,255,255,0.1)',
-                  transition: 'transform 0.2s',
-                  '&:hover': { transform: 'scale(1.05)' },
-                  cursor: isLoading ? 'not-allowed' : 'pointer',
-                  opacity: isLoading ? 0.5 : 1,
-                }}
-                onClick={() => !isLoading && handleMovieClick(movie.filmId)}
-              >
-                <CardMedia component="img" sx={{ width: 100 }} image={movie.posterUrlPreview} alt={movie.nameRu} />
-                <CardContent>
-                  <Typography variant="h6">{movie.nameRu || movie.nameEn || movie.nameOriginal}</Typography>
-                  <Typography variant="subtitle1" sx={{ color: '#2862DE', fontWeight: '525' }}>
-                    {TypeHandler(movie.relationType)}
-                  </Typography>
-                </CardContent>
-              </Card>
-            ))
-          )}
+          {relatedMovies.map((movie) => (
+            <Card
+              key={movie.filmId}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                margin: { xs: '5px', lg: '10px' },
+                mb: 2,
+                maxWidth: '500px',
+                color: 'white',
+                backgroundColor: 'rgba(255,255,255,0.1)',
+                transition: 'transform 0.2s',
+                '&:hover': { transform: 'scale(1.05)' },
+                cursor: isLoading ? 'not-allowed' : 'pointer',
+                opacity: isLoading ? 0.5 : 1,
+              }}
+              onClick={() => !isLoading && handleMovieClick(movie.filmId)}
+            >
+              <CardMedia component="img" sx={{ width: 100 }} image={movie.posterUrlPreview} alt={movie.nameRu} />
+              <CardContent>
+                <Typography variant="h6">{movie.nameRu || movie.nameEn || movie.nameOriginal}</Typography>
+                <Typography variant="subtitle1" sx={{ color: '#2862DE', fontWeight: '525' }}>
+                  {TypeHandler(movie.relationType)}
+                </Typography>
+              </CardContent>
+            </Card>
+          ))}
         </Box>
       )}
     </Box>
