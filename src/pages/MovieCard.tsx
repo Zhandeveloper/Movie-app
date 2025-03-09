@@ -262,7 +262,7 @@ const MovieCard: React.FC = () => {
         </Box>
       </Box>
       <section style={{ fontSize: '27px' }}>
-        <BudgetMovie movieId={id}/>
+        <BudgetMovie movieId={id} />
         <RelatedMovies movieId={id} />
         <Button
           sx={{
@@ -324,50 +324,51 @@ const MovieCard: React.FC = () => {
         </Typography>
       </section>
       <section style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
-      <Button
-  sx={{
-    color: 'white',
-    height: 52,
-    marginRight: 8,
-    padding: '14px 28px',
-    fontSize: 16,
-    fontWeight: 600,
-    borderRadius: '100px',
-    background: 'linear-gradient(135deg, #0066ff 69.93%, #00c2ff)',
-    transition: 'background .2s ease, transform .2s ease',
-    '&:hover': {
-      transform: 'scale(1.05)',
-      filter: 'brightness(1.1)',
-      boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
-    },
-  }}
-  onClick={(e) => {
-    e.preventDefault();
+        <Button
+          sx={{
+            color: 'white',
+            height: 52,
+            marginRight: 8,
+            padding: '14px 28px',
+            fontSize: 16,
+            fontWeight: 600,
+            borderRadius: '100px',
+            background: 'linear-gradient(135deg, #0066ff 69.93%, #00c2ff)',
+            transition: 'background .2s ease, transform .2s ease',
+            '&:hover': {
+              transform: 'scale(1.05)',
+              filter: 'brightness(1.1)',
+              boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
+            },
+          }}
+          onClick={(e) => {
+            e.preventDefault();
 
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const query = encodeURIComponent(film.nameRu);
+            const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const query = encodeURIComponent(film.nameRu);
 
-    // Глубокая ссылка для открытия в приложении VK
-    const deepLink = `vk://vk.com/video?q=${query}`;
-    // Обычная ссылка, если deep link не сработает
-    const fallbackUrl = `https://vk.com/video?q=${query}`;
+            // Глубокая ссылка для мобильных устройств
+            const deepLink = `vk://vk.com/video?q=${query}`;
+            // Запасная ссылка (если приложение не установлено)
+            const fallbackUrl = `https://vk.com/video?q=${query}`;
 
-    if (isMobile) {
-      window.location.href = deepLink;
-      
-      // Таймер для fallback (если приложение не открылось)
-      setTimeout(() => {
-        window.location.href = fallbackUrl;
-      }, 1500);
-    } else {
-      window.open(fallbackUrl, '_blank');
-    }
-  }}
->
-  <SlideshowIcon sx={{ marginRight: '2px' }} />
-  Смотреть в VK
-</Button>
-
+            if (isMobile) {
+              const newTab = window.open(deepLink, '_blank');
+              setTimeout(() => {
+                if (newTab) {
+                  newTab.location.href = fallbackUrl;
+                } else {
+                  window.location.href = fallbackUrl;
+                }
+              }, 500);
+            } else {
+              window.open(fallbackUrl, '_blank');
+            }
+          }}
+        >
+          <SlideshowIcon sx={{ marginRight: '2px' }} />
+          Смотреть в VK
+        </Button>
 
         <Button
           sx={{
