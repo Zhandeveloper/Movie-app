@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Select, MenuItem, FormControl} from '@mui/material';
 import { Link } from 'react-router-dom';
 
 export interface Staff {
@@ -8,7 +8,7 @@ export interface Staff {
   nameEn: string;
   description?: string;
   posterUrl?: string;
-  professionText?: string;
+  professionText: string;
 }
 
 interface MovieStaffProps {
@@ -21,6 +21,8 @@ const MovieStaff: React.FC<MovieStaffProps> = ({ movieId }) => {
   const [error, setError] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(0);
   const [loadMoreCount, setLoadMoreCount] = useState(0);
+  const [selectedProfession, setSelectedProfession] = useState<string>('');
+  const [professions, setProfessions] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchStaff = async () => {
@@ -35,8 +37,16 @@ const MovieStaff: React.FC<MovieStaffProps> = ({ movieId }) => {
         if (!response.ok) {
           throw new Error(`Ошибка ${response.status}: ${response.statusText}`);
         }
-        const data = await response.json();
+        const data: Staff[] = await response.json(); // Явная типизация данных
+      
         setStaff(data);
+        setProfessions([
+          ...new Set(
+            data
+              .map((item) => item.professionText || "")
+              .filter((p): p is string => p !== "")
+          )
+        ]); 
         setVisibleCount(window.innerWidth < 1000 ? 4 : 20);
       } catch (err) {
         setError('Ошибка при загрузке данных актерского состава');
@@ -63,12 +73,28 @@ const MovieStaff: React.FC<MovieStaffProps> = ({ movieId }) => {
   if (loading) return <h2>Загрузка...</h2>;
   if (error) return <h2>{error}</h2>;
 
+  const filteredStaff = selectedProfession ? staff.filter((s) => s.professionText === selectedProfession) : staff;
+
   return (
     <Box>
       <h1>Киногруппа:</h1>
-      {staff.length > 0 ? (
+      <FormControl sx={{ minWidth: 200, mb: 2 }}>
+      
+        <Select
+          value={selectedProfession}
+          onChange={(e) => setSelectedProfession(e.target.value)}
+          displayEmpty
+          sx={{ mb: 2, backgroundColor: 'white' }}
+        >
+          <MenuItem value="">Все</MenuItem>
+          {professions.map((profession) => (
+            <MenuItem key={profession} value={profession}>{profession}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      {filteredStaff.length > 0 ? (
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
-          {staff.slice(0, visibleCount).map((item) => (
+          {filteredStaff.slice(0, visibleCount).map((item) => (
             <div
               key={item.staffId}
               className="similarsMovieCard"
@@ -110,9 +136,9 @@ const MovieStaff: React.FC<MovieStaffProps> = ({ movieId }) => {
           ))}
         </Box>
       ) : (
-        <h2>Нету данных</h2>
+        <h2>Нет данных</h2>
       )}
-      {visibleCount < staff.length && (
+      {visibleCount < filteredStaff.length && (
         <Button variant="contained" onClick={handleLoadMore} sx={{ mt: 2 }}>
           Показать ещё
         </Button>

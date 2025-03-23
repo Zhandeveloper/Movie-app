@@ -194,8 +194,8 @@ const StaffCard = () => {
                 fontSize: { xs: '22px', sm: '27px', md: '28px', lg: '30px', xl: '30px' },
               }}
             >
-              <p>Возраст: {person.age} лет</p>
-              <p>Место рождения: {person.birthplace}</p>
+              <p>Возраст: {person.age ? `${person.age} лет` : 'неизвестно'}</p>
+              <p>Место рождения: {person.birthplace ? `${person.birthplace} лет` : 'неизвестно'}</p>
               <p>Дата рождения: {person.birthday ? formatDate(person.birthday) : 'Неизвестно'}</p>
               <p>Рост: {person.growth === 0 ? 'неизвестно' : `${person.growth} см`}</p>
             </Box>
