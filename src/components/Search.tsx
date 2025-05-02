@@ -32,7 +32,7 @@ interface ApiFilm {
 }
 
 interface SearchProps {
-  onSearch: (films: Film[]) => void;
+  onSearch: (films: Film[], totalPages: number) => void; // Updated to include totalPages
 }
 
 const genres: Genre[] = [
@@ -101,8 +101,9 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
   const [ratingFrom, setRatingFrom] = useState<string>('');
   const [ratingTo, setRatingTo] = useState<string>('');
   const [order, setOrder] = useState<string>('RATING');
-  const [type, setType] = useState<string>(''); // <-- новый стейт для type
+  const [type, setType] = useState<string>('');
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1); // Added for pagination
 
   useEffect(() => {
     const savedFilters = localStorage.getItem('lastSearchFilters');
@@ -116,7 +117,7 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
       setRatingFrom(f.ratingFrom || '');
       setRatingTo(f.ratingTo || '');
       setOrder(f.order || 'RATING');
-      setType(f.type || ''); // <-- подгружаем сохранённый type
+      setType(f.type || '');
     }
   }, []);
 
@@ -144,7 +145,7 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
     return true;
   };
 
-  const fetchFilms = async () => {
+  const fetchFilms = async (page: number = 1) => {
     if (!query && !genre && !country && !yearFrom && !yearTo && !ratingFrom && !ratingTo && !type) {
       alert('Ничего не выбрано');
       return;
@@ -155,13 +156,13 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
     if (country) params.append('countries', country.toString());
     if (genre) params.append('genres', genre.toString());
     params.append('order', order);
-    params.append('type', type || 'ALL'); // <-- используем выбранный type или ALL по умолчанию
+    params.append('type', type || 'ALL');
     params.append('ratingFrom', ratingFrom || '0');
     params.append('ratingTo', ratingTo || '10');
     params.append('yearFrom', yearFrom || '1000');
     params.append('yearTo', yearTo || '3000');
     if (query.trim()) params.append('keyword', query);
-    params.append('page', '1');
+    params.append('page', page.toString());
 
     try {
       const res = await fetch(`https://kinopoiskapiunofficial.tech/api/v2.2/films?${params}`, {
@@ -179,7 +180,7 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
         ratingKinopoisk: film.ratingKinopoisk ?? undefined,
         ratingImdb: film.ratingImdb ?? undefined,
       }));
-      onSearch(formatted);
+      onSearch(formatted, data.totalPages || 1); // Pass totalPages
       localStorage.setItem(
         'lastSearchFilters',
         JSON.stringify({
@@ -192,6 +193,7 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
           ratingTo,
           order,
           type,
+          page,
         }),
       );
       localStorage.setItem('lastSearchResults', JSON.stringify(formatted));
@@ -200,8 +202,14 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
     }
   };
 
+
+ 
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') fetchFilms();
+    if (e.key === 'Enter') {
+      setCurrentPage(1); // Reset to first page on new search
+      fetchFilms(1);
+    }
   };
 
   const resetFilters = () => {
@@ -213,14 +221,14 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
     setRatingFrom('');
     setRatingTo('');
     setOrder('RATING');
-    setType(''); // <-- сбрасываем и type
+    setType('');
+    setCurrentPage(1); // Reset page
   };
 
   const toggleFilters = () => setFiltersOpen(!filtersOpen);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      {/* строка поиска */}
       <div style={{ display: 'flex', gap: 10 }}>
         <TextField
           fullWidth
@@ -235,12 +243,18 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
             input: { color: 'black', fontSize: 20 },
           }}
         />
-        <Button variant="contained" onClick={fetchFilms} sx={{ fontSize: 18, textTransform: 'none' }}>
+        <Button
+          variant="contained"
+          onClick={() => {
+            setCurrentPage(1); // Reset to first page on new search
+            fetchFilms(1);
+          }}
+          sx={{ fontSize: 18, textTransform: 'none' }}
+        >
           <SearchIcon /> Искать
         </Button>
       </div>
 
-      {/* кнопка показа/скрытия фильтров */}
       <Button
         variant="outlined"
         onClick={toggleFilters}
@@ -265,10 +279,8 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
         )}
       </Button>
 
-      {/* сами фильтры */}
       {filtersOpen && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-          {/* Тип фильма */}
           <FormControl sx={{ minWidth: 140 }}>
             <InputLabel sx={{ color: 'white', '&.Mui-focused': { color: 'white' } }}>Тип фильма</InputLabel>
             <Select
@@ -287,7 +299,6 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
             </Select>
           </FormControl>
 
-          {/* Жанр */}
           <FormControl sx={{ minWidth: 120 }}>
             <InputLabel sx={{ color: 'white', '&.Mui-focused': { color: 'white' } }}>Жанр</InputLabel>
             <Select
@@ -306,7 +317,6 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
             </Select>
           </FormControl>
 
-          {/* Страна */}
           <FormControl sx={{ minWidth: 120 }}>
             <InputLabel sx={{ color: 'white', '&.Mui-focused': { color: 'white' } }}>Страна</InputLabel>
             <Select
@@ -325,7 +335,6 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
             </Select>
           </FormControl>
 
-          {/* Года и рейтинги */}
           <TextField
             label="Год от"
             type="number"
@@ -375,7 +384,6 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
             }}
           />
 
-          {/* Сортировка */}
           <FormControl sx={{ minWidth: 120 }}>
             <InputLabel sx={{ color: 'white', '&.Mui-focused': { color: 'white' } }}>Сортировка</InputLabel>
             <Select
@@ -389,7 +397,6 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
             </Select>
           </FormControl>
 
-          {/* Сброс */}
           <Button variant="outlined" onClick={resetFilters} sx={{ color: 'white', border: '1.5px solid black' }}>
             Сбросить фильтры
           </Button>

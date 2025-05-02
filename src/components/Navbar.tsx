@@ -8,7 +8,7 @@ import Search from './Search';
 import { Film } from '../pages/Home';
 interface NavbarProps {
   onCategoryChange: (category: string) => void;
-  onSearch: (films: Film[]) => void; // Передаём функцию поиска
+  onSearch: (films: Film[]) => void; 
 }
 
 const Navbar: React.FC<NavbarProps> = ({ onCategoryChange, onSearch }) => {

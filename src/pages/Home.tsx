@@ -45,11 +45,11 @@ const NameConvertHanlder = (category?: string): string => {
     case 'COMICS_THEME':
       return 'Фильмы по комиксам';
     case 'VAMPIRE_THEME':
-      return 'Фильмы про вамиров';
+      return 'Фильмы про вампиров';
     case 'TOP_POPULAR_MOVIES':
       return 'Топ популярных фильмов';
     default:
-      return 'Неизвестно';
+      return 'Результаты поиска';
   }
 };
 
@@ -144,16 +144,23 @@ const Home: React.FC = () => {
   const [category, setCategory] = useState<string>('TOP_POPULAR_MOVIES');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-
-
-
+  const [isSearch, setIsSearch] = useState<boolean>(false); // Track if results are from search
 
   useEffect(() => {
-    const savedFilms = localStorage.getItem('searchedFilms');
+    const savedFilms = localStorage.getItem('lastSearchResults');
     if (savedFilms) {
-      setFilms(JSON.parse(savedFilms));
+      const parsedFilms = JSON.parse(savedFilms);
+      setFilms(parsedFilms);
+      setIsSearch(true);
+      // Fetch total pages for saved search
+      const savedFilters = localStorage.getItem('lastSearchFilters');
+      if (savedFilters) {
+        const filters = JSON.parse(savedFilters);
+        fetchSearchFilms(filters, filters.page || 1);
+      }
     } else {
       fetchFilms(category, currentPage);
+      setIsSearch(false);
     }
     scrollToTop();
   }, [category, currentPage]);
@@ -177,20 +184,71 @@ const Home: React.FC = () => {
       const data = await response.json();
       setFilms(data.items || []);
       setTotalPages(data.totalPages || 1);
-      localStorage.removeItem('searchedFilms');
+      setIsSearch(false);
+      localStorage.removeItem('lastSearchResults');
+      localStorage.removeItem('lastSearchFilters');
     } catch (error) {
       console.error('Ошибка при загрузке данных:', error);
     }
   };
 
-  const handleSearch = (searchResults: Film[]) => {
+  const fetchSearchFilms = async (filters: any, page: number) => {
+    const params = new URLSearchParams();
+    if (filters.country) params.append('countries', filters.country.toString());
+    if (filters.genre) params.append('genres', filters.genre.toString());
+    params.append('order', filters.order || 'RATING');
+    params.append('type', filters.type || 'ALL');
+    params.append('ratingFrom', filters.ratingFrom || '0');
+    params.append('ratingTo', filters.ratingTo || '10');
+    params.append('yearFrom', filters.yearFrom || '1000');
+    params.append('yearTo', filters.yearTo || '3000');
+    if (filters.query && filters.query.trim()) params.append('keyword', filters.query);
+    params.append('page', page.toString());
+
+    try {
+      const res = await fetch(`https://kinopoiskapiunofficial.tech/api/v2.2/films?${params}`, {
+        headers: {
+          'X-API-KEY': '8c8e1a50-6322-4135-8875-5d40a5420d86',
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await res.json();
+      const formatted: Film[] = data.items.map((film: any) => ({
+        kinopoiskId: film.kinopoiskId,
+        nameRu: film.nameRu,
+        genres: film.genres,
+        posterUrlPreview: film.posterUrlPreview,
+        ratingKinopoisk: film.ratingKinopoisk ?? undefined,
+        ratingImdb: film.ratingImdb ?? undefined,
+      }));
+      setFilms(formatted);
+      setTotalPages(data.totalPages || 1);
+      setIsSearch(true);
+      localStorage.setItem('lastSearchResults', JSON.stringify(formatted));
+      localStorage.setItem('lastSearchFilters', JSON.stringify({ ...filters, page }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSearch = (searchResults: Film[], searchTotalPages: number) => {
     setFilms(searchResults);
-    localStorage.setItem('searchedFilms', JSON.stringify(searchResults));
+    setTotalPages(searchTotalPages);
+    setCurrentPage(1);
+    setIsSearch(true);
+    localStorage.setItem('lastSearchResults', JSON.stringify(searchResults));
   };
 
   const handlePageChange = (event: SelectChangeEvent<number>) => {
     const page = Number(event.target.value);
     setCurrentPage(page);
+    if (isSearch) {
+      const savedFilters = localStorage.getItem('lastSearchFilters');
+      if (savedFilters) {
+        const filters = JSON.parse(savedFilters);
+        fetchSearchFilms(filters, page);
+      }
+    }
   };
 
   return (
@@ -198,7 +256,10 @@ const Home: React.FC = () => {
       <Navbar
         onCategoryChange={(newCategory) => {
           setCategory(newCategory);
-          localStorage.removeItem('searchedFilms');
+          localStorage.removeItem('lastSearchResults');
+          localStorage.removeItem('lastSearchFilters');
+          setIsSearch(false);
+          setCurrentPage(1);
         }}
         onSearch={handleSearch}
       />
@@ -221,7 +282,7 @@ const Home: React.FC = () => {
         ))}
       </div>
 
-      {films.length > 0 && !localStorage.getItem('searchedFilms') && (
+      {films.length > 0 && (
         <Box
           sx={{
             display: 'flex',
@@ -234,14 +295,24 @@ const Home: React.FC = () => {
         >
           <Button
             variant="contained"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            onClick={() => {
+              const newPage = Math.max(currentPage - 1, 1);
+              setCurrentPage(newPage);
+              if (isSearch) {
+                const savedFilters = localStorage.getItem('lastSearchFilters');
+                if (savedFilters) {
+                  const filters = JSON.parse(savedFilters);
+                  fetchSearchFilms(filters, newPage);
+                }
+              }
+            }}
             disabled={currentPage === 1}
           >
             {currentPage > 1 && <WestIcon sx={{ padding: '10px', fontSize: { xs: '25px', xl: '35px' } }} />}
           </Button>
 
           <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h5">{NameConvertHanlder(category)}</Typography>
+            <Typography variant="h5">{NameConvertHanlder(isSearch ? 'SEARCH' : category)}</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', mt: 1 }}>
               <Typography variant="subtitle1">Страница</Typography>
               <Select
@@ -250,7 +321,7 @@ const Home: React.FC = () => {
                 sx={{
                   color: 'white',
                   border: '1px solid orange',
-                  width:'75px',
+                  width: '75px',
                   borderRadius: '4px',
                   '& .MuiSelect-icon': { color: 'orange' },
                   '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
@@ -279,14 +350,24 @@ const Home: React.FC = () => {
 
           <Button
             variant="contained"
-            onClick={() => setCurrentPage((prev) => prev + 1)}
+            onClick={() => {
+              const newPage = currentPage + 1;
+              setCurrentPage(newPage);
+              if (isSearch) {
+                const savedFilters = localStorage.getItem('lastSearchFilters');
+                if (savedFilters) {
+                  const filters = JSON.parse(savedFilters);
+                  fetchSearchFilms(filters, newPage);
+                }
+              }
+            }}
             disabled={currentPage >= totalPages}
           >
             <EastIcon sx={{ padding: '10px', fontSize: { xs: '25px', xl: '35px' } }} />
           </Button>
         </Box>
       )}
-      <Footer/>
+      <Footer />
     </>
   );
 };
