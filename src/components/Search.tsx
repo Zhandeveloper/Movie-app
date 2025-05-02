@@ -8,9 +8,17 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FilterListIcon from '@mui/icons-material/FilterList';
 
-import { Film } from '../pages/Home';
+// Assuming Film type is defined in Home
+interface Film {
+  kinopoiskId: number;
+  nameRu: string;
+  genres: { genre: string }[];
+  posterUrlPreview: string;
+  ratingKinopoisk?: number;
+  ratingImdb?: number;
+}
 
-// Типы для жанров и стран
+// Types for genres and countries
 interface Genre {
   id: number;
   genre: string;
@@ -21,7 +29,7 @@ interface Country {
   country: string;
 }
 
-// Тип для данных API
+// Type for API data
 interface ApiFilm {
   kinopoiskId: number;
   nameRu: string;
@@ -32,7 +40,7 @@ interface ApiFilm {
 }
 
 interface SearchProps {
-  onSearch: (films: Film[], totalPages: number) => void; // Updated to include totalPages
+  onSearch: (films: Film[], totalPages: number) => void;
 }
 
 const genres: Genre[] = [
@@ -62,6 +70,7 @@ const genres: Genre[] = [
   { id: 24, genre: 'аниме' },
   { id: 33, genre: 'детский' },
 ];
+
 const countries: Country[] = [
   { id: 1, country: 'США' },
   { id: 2, country: 'Швейцария' },
@@ -103,7 +112,8 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
   const [order, setOrder] = useState<string>('RATING');
   const [type, setType] = useState<string>('');
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
-  const [currentPage, setCurrentPage] = useState<number>(1); // Added for pagination
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   useEffect(() => {
     const savedFilters = localStorage.getItem('lastSearchFilters');
@@ -118,6 +128,7 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
       setRatingTo(f.ratingTo || '');
       setOrder(f.order || 'RATING');
       setType(f.type || '');
+      setCurrentPage(f.page || 1);
     }
   }, []);
 
@@ -145,7 +156,7 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
     return true;
   };
 
-  const fetchFilms = async (page: number = 1) => {
+  const fetchFilms = async (page: number) => {
     if (!query && !genre && !country && !yearFrom && !yearTo && !ratingFrom && !ratingTo && !type) {
       alert('Ничего не выбрано');
       return;
@@ -180,7 +191,8 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
         ratingKinopoisk: film.ratingKinopoisk ?? undefined,
         ratingImdb: film.ratingImdb ?? undefined,
       }));
-      onSearch(formatted, data.totalPages || 1); // Pass totalPages
+      setTotalPages(data.totalPages || 1);
+      onSearch(formatted, data.totalPages || 1);
       localStorage.setItem(
         'lastSearchFilters',
         JSON.stringify({
@@ -202,12 +214,9 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
     }
   };
 
-
- 
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      setCurrentPage(1); // Reset to first page on new search
+      setCurrentPage(1);
       fetchFilms(1);
     }
   };
@@ -222,10 +231,18 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
     setRatingTo('');
     setOrder('RATING');
     setType('');
-    setCurrentPage(1); // Reset page
+    setCurrentPage(1);
+    setTotalPages(1);
   };
 
   const toggleFilters = () => setFiltersOpen(!filtersOpen);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      fetchFilms(newPage);
+    }
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -246,7 +263,7 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
         <Button
           variant="contained"
           onClick={() => {
-            setCurrentPage(1); // Reset to first page on new search
+            setCurrentPage(1);
             fetchFilms(1);
           }}
           sx={{ fontSize: 18, textTransform: 'none' }}
@@ -399,6 +416,30 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
 
           <Button variant="outlined" onClick={resetFilters} sx={{ color: 'white', border: '1.5px solid black' }}>
             Сбросить фильтры
+          </Button>
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 10 }}>
+          <Button
+            variant="outlined"
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+            sx={{ color: 'white', border: '1px solid black' }}
+          >
+            Предыдущая
+          </Button>
+          <span style={{ color: 'white', fontSize: 16 }}>
+            Страница {currentPage} из {totalPages}
+          </span>
+          <Button
+            variant="outlined"
+            disabled={currentPage === totalPages}
+            onClick={() => handlePageChange(currentPage + 1)}
+            sx={{ color: 'white', border: '1px solid black' }}
+          >
+            Следующая
           </Button>
         </div>
       )}

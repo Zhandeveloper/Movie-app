@@ -22,6 +22,19 @@ export interface Film {
   rating?: string;
 }
 
+interface SearchFilters {
+  country?: number;
+  genre?: number;
+  order?: string;
+  type?: string;
+  ratingFrom?: string;
+  ratingTo?: string;
+  yearFrom?: string;
+  yearTo?: string;
+  query?: string;
+  page?: number;
+}
+
 const handleButtonClick = (filmId: number) => {
   const filmUrl = `https://www.kinopoisk.ru/film/${filmId}/`;
   window.open(filmUrl, '_blank');
@@ -144,7 +157,7 @@ const Home: React.FC = () => {
   const [category, setCategory] = useState<string>('TOP_POPULAR_MOVIES');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [isSearch, setIsSearch] = useState<boolean>(false); // Track if results are from search
+  const [isSearch, setIsSearch] = useState<boolean>(false);
 
   useEffect(() => {
     const savedFilms = localStorage.getItem('lastSearchResults');
@@ -152,7 +165,6 @@ const Home: React.FC = () => {
       const parsedFilms = JSON.parse(savedFilms);
       setFilms(parsedFilms);
       setIsSearch(true);
-      // Fetch total pages for saved search
       const savedFilters = localStorage.getItem('lastSearchFilters');
       if (savedFilters) {
         const filters = JSON.parse(savedFilters);
@@ -179,7 +191,7 @@ const Home: React.FC = () => {
             'X-API-KEY': '8c8e1a50-6322-4135-8875-5d40a5420d86',
             'Content-Type': 'application/json',
           },
-        },
+        }
       );
       const data = await response.json();
       setFilms(data.items || []);
@@ -192,7 +204,7 @@ const Home: React.FC = () => {
     }
   };
 
-  const fetchSearchFilms = async (filters: any, page: number) => {
+  const fetchSearchFilms = async (filters: SearchFilters, page: number) => {
     const params = new URLSearchParams();
     if (filters.country) params.append('countries', filters.country.toString());
     if (filters.genre) params.append('genres', filters.genre.toString());
@@ -213,7 +225,7 @@ const Home: React.FC = () => {
         },
       });
       const data = await res.json();
-      const formatted: Film[] = data.items.map((film: any) => ({
+      const formatted: Film[] = data.items.map((film: Film) => ({
         kinopoiskId: film.kinopoiskId,
         nameRu: film.nameRu,
         genres: film.genres,
