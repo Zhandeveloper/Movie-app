@@ -6,14 +6,15 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Search from './Search';
 import { Film } from '../pages/Home';
+
 interface NavbarProps {
   onCategoryChange: (category: string) => void;
-  onSearch: (films: Film[]) => void; 
+  onSearch: (films: Film[], totalPages: number) => void; // Updated to include totalPages
 }
 
 const Navbar: React.FC<NavbarProps> = ({ onCategoryChange, onSearch }) => {
   return (
-    <Box sx={{ flexGrow: 1, margin:0, padding:0 }}>
+    <Box sx={{ flexGrow: 1, margin: 0, padding: 0 }}>
       <AppBar position="static" sx={{ display: 'flex', justifyContent: 'center' }}>
         <Toolbar sx={{ flexDirection: 'column', alignItems: 'center', width: '90%' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
@@ -21,8 +22,8 @@ const Navbar: React.FC<NavbarProps> = ({ onCategoryChange, onSearch }) => {
               <MenuIcon />
             </IconButton>
           </Box>
-          <Box sx={{ width:{ xs: '95%', xl: '70%' } }}>
-            <Search onSearch={onSearch} /> {/* Передаём в `Search` */}
+          <Box sx={{ width: { xs: '95%', xl: '70%' } }}>
+            <Search onSearch={onSearch} /> {/* Pass onSearch to Search */}
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: '25px', flexWrap: 'wrap' }}>
             <Button
@@ -66,4 +67,5 @@ const Navbar: React.FC<NavbarProps> = ({ onCategoryChange, onSearch }) => {
     </Box>
   );
 };
+
 export default Navbar;

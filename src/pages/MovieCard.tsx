@@ -64,9 +64,12 @@ const formatDuration = (minutes?: number): string => {
 const typeContentHandler = (content?: string): string => {
   if (content === 'FILM') {
     return 'Фильмы';
-  }
-  if (content === 'TV_SERIES') {
+  } else if (content === 'TV_SERIES') {
     return 'Сериалы';
+  } else if (content === 'TV_SHOW') {
+    return 'ТВ-шоу';
+  } else if (content === 'MINI_SERIES') {
+    return 'Мини-сериалы';
   } else {
     return 'Неизвестно';
   }
@@ -75,13 +78,17 @@ const typeContentHandler = (content?: string): string => {
 const typeSingleContentHandler = (content?: string): string => {
   if (content === 'FILM') {
     return 'фильме';
-  }
-  if (content === 'TV_SERIES') {
+  } else if (content === 'TV_SERIES') {
     return 'сериале';
+  } else if (content === 'TV_SHOW') {
+    return 'ТВ-шоу';
+  } else if (content === 'MINI_SERIES') {
+    return 'мини-сериалы';
   } else {
     return 'неизвестно';
   }
 };
+
 
 const AgeHandler = (age?: string): string => {
   switch (age) {
@@ -390,7 +397,22 @@ const MovieCard: React.FC = () => {
           }}
           onClick={(e) => {
             e.preventDefault();
-            window.open(`https://www.youtube.com/results?search_query=${film.nameRu}`);
+
+            const typeMap: Record<string, string> = {
+              FILM: 'Фильм',
+              TV_SHOW: 'ТВ-шоу',
+              TV_SERIES: 'Сериал',
+              MINI_SERIES: 'Мини-сериал',
+            };
+
+            const type = film.type || '';
+            const typeRu = typeMap[type] || '';
+            const trailerPart = type === 'TV_SHOW' ? '' : 'трейлер';
+
+            const query = ` ${typeRu} ${film.nameRu} ${trailerPart} `.trim();
+            const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+
+            window.open(url);
           }}
         >
           <YouTubeIcon />

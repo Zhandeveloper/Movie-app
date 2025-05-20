@@ -7,6 +7,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import WestIcon from '@mui/icons-material/West';
 import EastIcon from '@mui/icons-material/East';
+import CircularProgress from '@mui/material/CircularProgress';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
@@ -158,6 +159,7 @@ const Home: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [isSearch, setIsSearch] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const savedFilms = localStorage.getItem('lastSearchResults');
@@ -182,6 +184,7 @@ const Home: React.FC = () => {
   }, [category]);
 
   const fetchFilms = async (category: string, page: number) => {
+    setLoading(true);
     try {
       const response = await fetch(
         `https://kinopoiskapiunofficial.tech/api/v2.2/films/collections?type=${category}&page=${page}`,
@@ -201,10 +204,13 @@ const Home: React.FC = () => {
       localStorage.removeItem('lastSearchFilters');
     } catch (error) {
       console.error('Ошибка при загрузке данных:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchSearchFilms = async (filters: SearchFilters, page: number) => {
+    setLoading(true);
     const params = new URLSearchParams();
     if (filters.country) params.append('countries', filters.country.toString());
     if (filters.genre) params.append('genres', filters.genre.toString());
@@ -240,15 +246,18 @@ const Home: React.FC = () => {
       localStorage.setItem('lastSearchFilters', JSON.stringify({ ...filters, page }));
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSearch = (searchResults: Film[], searchTotalPages: number) => {
     setFilms(searchResults);
-    setTotalPages(searchTotalPages);
+    setTotalPages(searchTotalPages || 1);
     setCurrentPage(1);
     setIsSearch(true);
     localStorage.setItem('lastSearchResults', JSON.stringify(searchResults));
+    localStorage.setItem('lastSearchFilters', JSON.stringify({ page: 1 }));
   };
 
   const handlePageChange = (event: SelectChangeEvent<number>) => {
@@ -275,109 +284,123 @@ const Home: React.FC = () => {
         }}
         onSearch={handleSearch}
       />
-      <div
-        style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '10px', flexWrap: 'wrap' }}
-      >
-        {films.map((film) => (
-          <Link key={film.kinopoiskId} to={`/film/${film.kinopoiskId}`} style={{ textDecoration: 'none' }}>
-            <MediaCard
-              key={film.kinopoiskId}
-              title={film.nameRu}
-              ratingKinopoisk={
-                film.ratingKinopoisk && film.ratingKinopoisk > 0 ? film.ratingKinopoisk : film.ratingImdb ?? undefined
-              }
-              kinopoiskId={film.kinopoiskId}
-              image={film.posterUrlPreview || '/placeholder.jpg'}
-              genres={film.genres || []}
-            />
-          </Link>
-        ))}
-      </div>
-
-      {films.length > 0 && (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            color: 'white',
-            gap: { xs: '50px', sm: '70px', md: '80px', lg: '100px', xl: '100px' },
-            marginTop: '40px',
-          }}
-        >
-          <Button
-            variant="contained"
-            onClick={() => {
-              const newPage = Math.max(currentPage - 1, 1);
-              setCurrentPage(newPage);
-              if (isSearch) {
-                const savedFilters = localStorage.getItem('lastSearchFilters');
-                if (savedFilters) {
-                  const filters = JSON.parse(savedFilters);
-                  fetchSearchFilms(filters, newPage);
-                }
-              }
-            }}
-            disabled={currentPage === 1}
-          >
-            {currentPage > 1 && <WestIcon sx={{ padding: '10px', fontSize: { xs: '25px', xl: '35px' } }} />}
-          </Button>
-
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h5">{NameConvertHanlder(isSearch ? 'SEARCH' : category)}</Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', mt: 1 }}>
-              <Typography variant="subtitle1">Страница</Typography>
-              <Select
-                value={currentPage}
-                onChange={handlePageChange}
-                sx={{
-                  color: 'white',
-                  border: '1px solid orange',
-                  width: '75px',
-                  borderRadius: '4px',
-                  '& .MuiSelect-icon': { color: 'orange' },
-                  '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-                }}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      bgcolor: 'rgb(28, 28, 53)',
-                      '& .MuiMenuItem-root': {
-                        color: 'white',
-                        '&:hover': { bgcolor: 'rgba(255, 165, 0, 0.2)' },
-                      },
-                    },
-                  },
-                }}
-              >
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <MenuItem key={page} value={page}>
-                    {page}
-                  </MenuItem>
-                ))}
-              </Select>
-              <Typography variant="subtitle1">из {totalPages}</Typography>
-            </Box>
-          </Box>
-
-          <Button
-            variant="contained"
-            onClick={() => {
-              const newPage = currentPage + 1;
-              setCurrentPage(newPage);
-              if (isSearch) {
-                const savedFilters = localStorage.getItem('lastSearchFilters');
-                if (savedFilters) {
-                  const filters = JSON.parse(savedFilters);
-                  fetchSearchFilms(filters, newPage);
-                }
-              }
-            }}
-            disabled={currentPage >= totalPages}
-          >
-            <EastIcon sx={{ padding: '10px', fontSize: { xs: '25px', xl: '35px' } }} />
-          </Button>
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+          <CircularProgress size={60} sx={{ color: 'orange' }} />
         </Box>
+      ) : (
+        <>
+          <div
+            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '10px', flexWrap: 'wrap' }}
+          >
+            {films.length > 0 ? (
+              films.map((film) => (
+                <Link key={film.kinopoiskId} to={`/film/${film.kinopoiskId}`} style={{ textDecoration: 'none' }}>
+                  <MediaCard
+                    key={film.kinopoiskId}
+                    title={film.nameRu}
+                    ratingKinopoisk={
+                      film.ratingKinopoisk && film.ratingKinopoisk > 0 ? film.ratingKinopoisk : film.ratingImdb ?? undefined
+                    }
+                    kinopoiskId={film.kinopoiskId}
+                    image={film.posterUrlPreview || '/placeholder.jpg'}
+                    genres={film.genres || []}
+                  />
+                </Link>
+              ))
+            ) : (
+              <Typography variant="h6" sx={{ color: 'white', textAlign: 'center', width: '100%' }}>
+                Фильмы не найдены
+              </Typography>
+            )}
+          </div>
+
+          {films.length > 0 && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: 'white',
+                gap: { xs: '50px', sm: '70px', md: '80px', lg: '100px', xl: '100px' },
+                marginTop: '40px',
+              }}
+            >
+              <Button
+                variant="contained"
+                onClick={() => {
+                  const newPage = Math.max(currentPage - 1, 1);
+                  setCurrentPage(newPage);
+                  if (isSearch) {
+                    const savedFilters = localStorage.getItem('lastSearchFilters');
+                    if (savedFilters) {
+                      const filters = JSON.parse(savedFilters);
+                      fetchSearchFilms(filters, newPage);
+                    }
+                  }
+                }}
+                disabled={currentPage === 1}
+              >
+                {currentPage > 1 && <WestIcon sx={{ padding: '10px', fontSize: { xs: '25px', xl: '35px' } }} />}
+              </Button>
+
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="h5">{NameConvertHanlder(isSearch ? 'SEARCH' : category)}</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', mt: 1 }}>
+                  <Typography variant="subtitle1">Страница</Typography>
+                  <Select
+                    value={currentPage}
+                    onChange={handlePageChange}
+                    sx={{
+                      color: 'white',
+                      border: '1px solid orange',
+                      width: '75px',
+                      borderRadius: '4px',
+                      '& .MuiSelect-icon': { color: 'orange' },
+                      '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                    }}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          bgcolor: 'rgb(28, 28, 53)',
+                          '& .MuiMenuItem-root': {
+                            color: 'white',
+                            '&:hover': { bgcolor: 'rgba(255, 165, 0, 0.2)' },
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <MenuItem key={page} value={page}>
+                        {page}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <Typography variant="subtitle1">из {totalPages}</Typography>
+                </Box>
+              </Box>
+
+              <Button
+                variant="contained"
+                onClick={() => {
+                  const newPage = currentPage + 1;
+                  setCurrentPage(newPage);
+                  if (isSearch) {
+                    const savedFilters = localStorage.getItem('lastSearchFilters');
+                    if (savedFilters) {
+                      const filters = JSON.parse(savedFilters);
+                      fetchSearchFilms(filters, newPage);
+                    }
+                  }
+                }}
+                disabled={currentPage >= totalPages}
+              >
+                <EastIcon sx={{ padding: '10px', fontSize: { xs: '25px', xl: '35px' } }} />
+              </Button>
+            </Box>
+          )}
+        </>
       )}
       <Footer />
     </>

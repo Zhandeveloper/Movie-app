@@ -7,16 +7,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FilterListIcon from '@mui/icons-material/FilterList';
-
-// Assuming Film type is defined in Home
-interface Film {
-  kinopoiskId: number;
-  nameRu: string;
-  genres: { genre: string }[];
-  posterUrlPreview: string;
-  ratingKinopoisk?: number;
-  ratingImdb?: number;
-}
+import { Film } from '../pages/Home';
 
 // Types for genres and countries
 interface Genre {
@@ -29,7 +20,7 @@ interface Country {
   country: string;
 }
 
-// Type for API data
+// Type for API film data
 interface ApiFilm {
   kinopoiskId: number;
   nameRu: string;
@@ -109,11 +100,9 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
   const [yearTo, setYearTo] = useState<string>('');
   const [ratingFrom, setRatingFrom] = useState<string>('');
   const [ratingTo, setRatingTo] = useState<string>('');
-  const [order, setOrder] = useState<string>('RATING');
+  const [order, setOrder] = useState<string>('NUM_VOTE');
   const [type, setType] = useState<string>('');
   const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
 
   useEffect(() => {
     const savedFilters = localStorage.getItem('lastSearchFilters');
@@ -126,17 +115,16 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
       setYearTo(f.yearTo || '');
       setRatingFrom(f.ratingFrom || '');
       setRatingTo(f.ratingTo || '');
-      setOrder(f.order || 'RATING');
+      setOrder(f.order || 'NUM_VOTE');
       setType(f.type || '');
-      setCurrentPage(f.page || 1);
     }
   }, []);
 
   const validateFilters = () => {
-    const yF = parseInt(yearFrom),
-      yT = parseInt(yearTo);
-    const rF = parseFloat(ratingFrom),
-      rT = parseFloat(ratingTo);
+    const yF = parseInt(yearFrom);
+    const yT = parseInt(yearTo);
+    const rF = parseFloat(ratingFrom);
+    const rT = parseFloat(ratingTo);
     if (yearFrom && (yF < 1870 || yF > 2050)) {
       alert('Год от некорректен');
       return false;
@@ -156,7 +144,7 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
     return true;
   };
 
-  const fetchFilms = async (page: number) => {
+  const fetchFilms = async (page: number = 1) => {
     if (!query && !genre && !country && !yearFrom && !yearTo && !ratingFrom && !ratingTo && !type) {
       alert('Ничего не выбрано');
       return;
@@ -191,7 +179,6 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
         ratingKinopoisk: film.ratingKinopoisk ?? undefined,
         ratingImdb: film.ratingImdb ?? undefined,
       }));
-      setTotalPages(data.totalPages || 1);
       onSearch(formatted, data.totalPages || 1);
       localStorage.setItem(
         'lastSearchFilters',
@@ -216,7 +203,6 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      setCurrentPage(1);
       fetchFilms(1);
     }
   };
@@ -229,20 +215,11 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
     setYearTo('');
     setRatingFrom('');
     setRatingTo('');
-    setOrder('RATING');
+    setOrder('NUM_VOTE');
     setType('');
-    setCurrentPage(1);
-    setTotalPages(1);
   };
 
   const toggleFilters = () => setFiltersOpen(!filtersOpen);
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
-      fetchFilms(newPage);
-    }
-  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -263,7 +240,6 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
         <Button
           variant="contained"
           onClick={() => {
-            setCurrentPage(1);
             fetchFilms(1);
           }}
           sx={{ fontSize: 18, textTransform: 'none' }}
@@ -299,7 +275,7 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
       {filtersOpen && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
           <FormControl sx={{ minWidth: 140 }}>
-            <InputLabel sx={{ color: 'white', '&.Mui-focused': { color: 'white' } }}>Тип фильма</InputLabel>
+            <InputLabel sx={{ color: 'white', '&.Mui-focused': { color: 'white' } }}>Тип </InputLabel>
             <Select
               value={type}
               onChange={(e) => setType(e.target.value)}
@@ -408,38 +384,14 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
               onChange={(e) => setOrder(e.target.value)}
               sx={{ width: 150, color: 'white', '& .MuiSelect-icon': { color: 'white' } }}
             >
+              <MenuItem value="NUM_VOTE">По голосам</MenuItem>
               <MenuItem value="RATING">По рейтингу</MenuItem>
               <MenuItem value="YEAR">По году</MenuItem>
-              <MenuItem value="NUM_VOTE">По голосам</MenuItem>
             </Select>
           </FormControl>
 
           <Button variant="outlined" onClick={resetFilters} sx={{ color: 'white', border: '1.5px solid black' }}>
             Сбросить фильтры
-          </Button>
-        </div>
-      )}
-
-      {totalPages > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 10 }}>
-          <Button
-            variant="outlined"
-            disabled={currentPage === 1}
-            onClick={() => handlePageChange(currentPage - 1)}
-            sx={{ color: 'white', border: '1px solid black' }}
-          >
-            Предыдущая
-          </Button>
-          <span style={{ color: 'white', fontSize: 16 }}>
-            Страница {currentPage} из {totalPages}
-          </span>
-          <Button
-            variant="outlined"
-            disabled={currentPage === totalPages}
-            onClick={() => handlePageChange(currentPage + 1)}
-            sx={{ color: 'white', border: '1px solid black' }}
-          >
-            Следующая
           </Button>
         </div>
       )}
